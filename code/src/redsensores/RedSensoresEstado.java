@@ -6,6 +6,7 @@ import IA.Red.*;
 public class RedSensoresEstado {
 
     // TODO: Como nos sabemos si los sensores estan conectados a algo o no? conectadoA != null?
+    // TODO: Añadir cantidad de informacion a enviar?
 
     private class SensorInfo extends Sensor {
         private int capacidadRestante;
