@@ -95,7 +95,7 @@ public class RedSensoresEstado {
             centrosInfoList.add(new CentroInfo(auxSensores.get(i).getCoordX(), 
                                                 auxSensores.get(i).getCoordY(), 
                                                 150, 
-                                                3));
+                                                25));
         }
 
         //Generar solucion inicial
