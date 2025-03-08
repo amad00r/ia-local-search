@@ -3,7 +3,7 @@ package redsensores;
 import redsensores.RedSensoresEstado;
 import java.util.Scanner;
 
-public class RedSensoresMain {
+public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 

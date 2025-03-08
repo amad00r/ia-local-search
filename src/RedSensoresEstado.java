@@ -175,5 +175,4 @@ public class RedSensoresEstado {
     }
 
     // TODO: Implementar operadores + definirlos  
-    
 }
