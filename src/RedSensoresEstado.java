@@ -187,7 +187,12 @@ public class RedSensoresEstado {
     public void cambiarConexion(int sensorOrigen, int sensorDestino) {
         //Eliminar la conexion antigua
         Object conexionAntigua = sensoresInfoList[sensorOrigen].getConectadoA();
-        conexionAntigua.recibirDesonexion();
+        
+        if (conexionAntigua instanceof SensorInfo) {
+            ((SensorInfo) conexionAntigua).recibirDesonexion();
+        } else if (conexionAntigua instanceof CentroInfo) {
+            ((CentroInfo) conexionAntigua).recibirDesonexion();
+        }
 
         //Establecer la nueva conexion
         sensoresInfoList[sensorOrigen].setConectadoA(sensoresInfoList[sensorDestino]);
