@@ -7,7 +7,17 @@ public class RedSensoresEstado {
     // TODO: Como nos sabemos si los sensores estan conectados a algo o no? conectadoA != null?
     // TODO: Añadir cantidad de informacion a enviar?
 
-    private class SensorInfo extends Sensor {
+    private interface Conectable {
+        int getCapacidadRestante();
+        void updateCapacidadRestante(int capacidadConexion);
+        int getConexionesRestantes();
+        void recibirConexion();
+        void recibirDesonexion();
+        int getCoordX(); 
+        int getCoordY(); 
+    }
+
+    private class SensorInfo extends Sensor implements Conectable {
         private int capacidadRestante;
         private int conexionesRestantes;
         private Object conectadoA; // Puede ser un Sensor o un Centro de Datos
@@ -19,37 +29,52 @@ public class RedSensoresEstado {
             this.conectadoA = conectadoA;
         }
 
+        @Override
         public int getCapacidadRestante() {
             return capacidadRestante;
         }
 
+        @Override
         public void updateCapacidadRestante(int capacidadConexion) {
             if (capacidadConexion < capacidadRestante) this.capacidadRestante -= capacidadConexion;
             else this.capacidadRestante = 0;
         }
 
+        @Override
         public int getConexionesRestantes() {
             return conexionesRestantes;
         }
 
+        @Override
         public void recibirConexion() {
             this.conexionesRestantes -= 1;
         }
 
+        @Override
         public void recibirDesonexion() {
             this.conexionesRestantes += 1;
+        }
+
+        @Override
+        public int getCoordX() {
+            return super.getCoordX();
+        }
+
+        @Override
+        public int getCoordY() {
+            return super.getCoordY();
         }
 
         public Object getConectadoA() {
             return conectadoA;
         }
-
+        
         public void setConectadoA(Object conectadoA) {
             this.conectadoA = conectadoA;
         }
     }
 
-    private class CentroInfo extends Centro {
+    private class CentroInfo extends Centro implements Conectable {
         private int capacidadRestante;
         private int conexionesRestantes;
 
@@ -59,28 +84,43 @@ public class RedSensoresEstado {
             this.conexionesRestantes = conexionesRestantes;
         }
 
+        @Override
         public int getCapacidadRestante() {
             return capacidadRestante;
         }
 
+        @Override
         public void updateCapacidadRestante(int capacidadConexion) {
             if (capacidadConexion < capacidadRestante) this.capacidadRestante -= capacidadConexion;
             else this.capacidadRestante = 0;
         }
 
+        @Override
         public int getConexionesRestantes() {
             return conexionesRestantes;
         }
 
+        @Override
         public void recibirConexion() {
             this.conexionesRestantes -= 1;
         }
 
+        @Override
         public void recibirDesonexion() {
             this.conexionesRestantes += 1;
         }
-    }
 
+        @Override
+        public int getCoordX() {
+            return super.getCoordX();
+        }
+
+        @Override
+        public int getCoordY() {
+            return super.getCoordY();
+        }
+    }
+    
     private SensorInfo[] sensoresInfoList;
     private CentroInfo[] centrosInfoList;
 
