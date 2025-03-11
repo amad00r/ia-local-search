@@ -36,6 +36,10 @@ public class RedSensoresEstado {
             this.conexionesRestantes -= 1;
         }
 
+        public void recibirDesonexion() {
+            this.conexionesRestantes += 1;
+        }
+
         public Object getConectadoA() {
             return conectadoA;
         }
@@ -70,6 +74,10 @@ public class RedSensoresEstado {
 
         public void recibirConexion() {
             this.conexionesRestantes -= 1;
+        }
+
+        public void recibirDesonexion() {
+            this.conexionesRestantes += 1;
         }
     }
 
@@ -175,5 +183,14 @@ public class RedSensoresEstado {
         centrosInfoList[i].recibirConexion();
     }
 
-    // TODO: Implementar operadores + definirlos  
+    //OPERADORES
+    public void cambiarConexion(int sensorOrigen, int sensorDestino) {
+        //Eliminar la conexion antigua
+        Object conexionAntigua = sensoresInfoList[sensorOrigen].getConectadoA();
+        conexionAntigua.recibirDesonexion();
+
+        //Establecer la nueva conexion
+        sensoresInfoList[sensorOrigen].setConectadoA(sensoresInfoList[sensorDestino]);
+        sensoresInfoList[sensorDestino].recibirConexion();
+    }
 }
