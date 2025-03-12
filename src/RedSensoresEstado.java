@@ -63,6 +63,9 @@ public class RedSensoresEstado {
         }
 
         public void setConectadoA(Conectable conectadoA) {
+            if (this.conectadoA != null)
+                this.conectadoA.recibirDesconexion(getThroughput());
+            conectadoA.recibirConexion(getThroughput());
             this.conectadoA = conectadoA;
         }
 
