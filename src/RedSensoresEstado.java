@@ -252,12 +252,18 @@ public class RedSensoresEstado {
     }
 
     //OPERADORES
-    public void cambiarConexion(SensorInfo origen, Conectable destino) {
+    public void cambiarConexion(SensorInfo origen, Conectable nuevoDestino) {
         //Eliminar la conexion antigua
         origen.getConectadoA().recibirDesconexion(origen.getThroughput());
 
         //Establecer la nueva conexion
-        origen.setConectadoA(destino);
-        destino.recibirConexion(origen.getThroughput());
+        origen.setConectadoA(nuevoDestino);
+        nuevoDestino.recibirConexion(origen.getThroughput());
+    }
+
+    public void intercambiarConexion (SensorInfo sensorA, SensorInfo sensorB) {
+        Conectable aux = sensorA.getConectadoA();
+        cambiarConexion(sensorA, sensorB.getConectadoA());
+        cambiarConexion(sensorB, aux);
     }
 }
