@@ -114,12 +114,12 @@ public class RedSensoresEstado {
     private SensorInfo[] sensoresInfoList;
     private CentroInfo[] centrosInfoList;
 
-    public RedSensoresEstado(int nsens, int ncent, int seed, int mode) {
+    public RedSensoresEstado(int nsens, int ncent, int seedSensor, int seedCentro, int mode) {
         sensoresInfoList = new SensorInfo[nsens];
         centrosInfoList = new CentroInfo[ncent];
         
         //Generar sensores con la info extra
-        Sensores auxSensores = new Sensores(nsens, seed);
+        Sensores auxSensores = new Sensores(nsens, seedSensor);
         for (int i = 0; i < nsens; i++) {
             sensoresInfoList[i] = new SensorInfo((int) auxSensores.get(i).getCapacidad(), 
                                                  auxSensores.get(i).getCoordX(), 
@@ -130,7 +130,7 @@ public class RedSensoresEstado {
         }
 
         //Generar centros de datos con la info extra
-        CentrosDatos auxCentros = new CentrosDatos(ncent, seed);
+        CentrosDatos auxCentros = new CentrosDatos(ncent, seedCentro);
         for (int i = 0; i < ncent; i++) {
             centrosInfoList[i] = new CentroInfo(auxSensores.get(i).getCoordX(), 
                                                 auxSensores.get(i).getCoordY(), 

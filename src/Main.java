@@ -13,15 +13,18 @@ public class Main {
         System.out.print("Ingrese el número de centros de datos: ");
         int numCentros = scanner.nextInt();
 
-        System.out.print("Ingrese la semilla para el generador de números aleatorios: ");
-        int semilla = scanner.nextInt();
+        System.out.print("Ingrese la semilla para los sensores: ");
+        int semillaSensor = scanner.nextInt();
+
+        System.out.print("Ingrese la semilla para los centros: ");
+        int semillaCentros = scanner.nextInt();
 
         System.out.print("Ingrese el modo de generación: ");
         int mode = scanner.nextInt();
 
         scanner.close();
 
-        RedSensoresEstado redSensores = new RedSensoresEstado(numSensores, numCentros, semilla, mode);
+        RedSensoresEstado redSensores = new RedSensoresEstado(numSensores, numCentros, semillaSensor, semillaCentros, mode);
         
         System.out.println("Coordenadas de los sensores:");
         for (int i = 0; i < numSensores; i++) {
