@@ -7,117 +7,107 @@ public class RedSensoresEstado {
     // TODO: Como nos sabemos si los sensores estan conectados a algo o no? conectadoA != null?
     // TODO: Añadir cantidad de informacion a enviar?
 
-    private interface Conectable {
-        int getCapacidadRestante();
-        void updateCapacidadRestante(int capacidadConexion);
-        int getConexionesRestantes();
-        void recibirConexion();
-        void recibirDesonexion();
-        int getCoordX(); 
-        int getCoordY(); 
-    }
+    private abstract class Conectable {
+        protected int capacidadRestante;
+        protected int conexionesRestantes;
 
-    private class SensorInfo extends Sensor implements Conectable {
-        private int capacidadRestante;
-        private int conexionesRestantes;
-        private Object conectadoA; // Puede ser un Sensor o un Centro de Datos
-
-        public SensorInfo(int capacidad, int cx, int cy, int capacidadRestante, int conexionesRestantes, Object conectadoA) {
-            super(capacidad, cx, cy);
+        public Conectable(int capacidadRestante, int conexionesRestantes) {
             this.capacidadRestante = capacidadRestante;
             this.conexionesRestantes = conexionesRestantes;
-            this.conectadoA = conectadoA;
         }
 
-        @Override
         public int getCapacidadRestante() {
             return capacidadRestante;
         }
 
-        @Override
-        public void updateCapacidadRestante(int capacidadConexion) {
-            if (capacidadConexion < capacidadRestante) this.capacidadRestante -= capacidadConexion;
-            else this.capacidadRestante = 0;
-        }
-
-        @Override
         public int getConexionesRestantes() {
             return conexionesRestantes;
         }
 
-        @Override
-        public void recibirConexion() {
+        public abstract void updateCapacidadRestante(int incremento);
+
+        public void recibirConexion(int capacidad) {
             this.conexionesRestantes -= 1;
+            updateCapacidadRestante(-capacidad);
         }
 
-        @Override
-        public void recibirDesonexion() {
+        public void recibirDesconexion(int capacidad) {
             this.conexionesRestantes += 1;
+            updateCapacidadRestante(capacidad);
         }
 
-        @Override
-        public int getCoordX() {
-            return super.getCoordX();
+        public abstract int getCoordX();
+        public abstract int getCoordY();
+    }
+
+    private class SensorInfo extends Conectable {
+        private Sensor sensor;
+        private Conectable conectadoA; // Puede ser un Sensor o un Centro de Datos
+
+        public SensorInfo(int capacidad, int cx, int cy, int capacidadRestante, int conexionesRestantes, Conectable conectadoA) {
+            super(capacidadRestante, conexionesRestantes);
+            sensor = new Sensor(capacidad, cx, cy);
+            this.conectadoA = conectadoA;
         }
 
-        @Override
-        public int getCoordY() {
-            return super.getCoordY();
+        public int getCapacidad() {
+            return (int)sensor.getCapacidad();
         }
 
-        public Object getConectadoA() {
+        public int getThroughput() {
+            return getCapacidad()*3 - Math.max(0, this.capacidadRestante);
+        }
+
+        public Conectable getConectadoA() {
             return conectadoA;
         }
-        
-        public void setConectadoA(Object conectadoA) {
+
+        public void setConectadoA(Conectable conectadoA) {
+            if (this.conectadoA != null)
+                this.conectadoA.recibirDesconexion(getThroughput());
+            conectadoA.recibirConexion(getThroughput());
             this.conectadoA = conectadoA;
         }
-    }
-
-    private class CentroInfo extends Centro implements Conectable {
-        private int capacidadRestante;
-        private int conexionesRestantes;
-
-        public CentroInfo(int cx, int cy, int capacidadRestante, int conexionesRestantes) {
-            super(cx, cy);
-            this.capacidadRestante = capacidadRestante;
-            this.conexionesRestantes = conexionesRestantes;
-        }
 
         @Override
-        public int getCapacidadRestante() {
-            return capacidadRestante;
-        }
-
-        @Override
-        public void updateCapacidadRestante(int capacidadConexion) {
-            if (capacidadConexion < capacidadRestante) this.capacidadRestante -= capacidadConexion;
-            else this.capacidadRestante = 0;
-        }
-
-        @Override
-        public int getConexionesRestantes() {
-            return conexionesRestantes;
-        }
-
-        @Override
-        public void recibirConexion() {
-            this.conexionesRestantes -= 1;
-        }
-
-        @Override
-        public void recibirDesonexion() {
-            this.conexionesRestantes += 1;
+        public void updateCapacidadRestante(int incremento) {
+            this.capacidadRestante += incremento;
+            if (this.conectadoA != null)
+                this.conectadoA.updateCapacidadRestante(incremento);
         }
 
         @Override
         public int getCoordX() {
-            return super.getCoordX();
+            return sensor.getCoordX();
         }
 
         @Override
         public int getCoordY() {
-            return super.getCoordY();
+            return sensor.getCoordY();
+        }
+    }
+
+    private class CentroInfo extends Conectable {
+        private Centro centro;
+
+        public CentroInfo(int cx, int cy, int capacidadRestante, int conexionesRestantes) {
+            super(capacidadRestante, conexionesRestantes);
+            centro = new Centro(cx, cy);
+        }
+
+        @Override
+        public void updateCapacidadRestante(int incremento) {
+            this.capacidadRestante += incremento;
+        }
+
+        @Override
+        public int getCoordX() {
+            return centro.getCoordX();
+        }
+
+        @Override
+        public int getCoordY() {
+            return centro.getCoordY();
         }
     }
     
@@ -151,11 +141,57 @@ public class RedSensoresEstado {
         //Generar solucion inicial
         if (mode == 0) solucionMala();
         else if (mode == 1) solucionBuena();
+
+        Evaluation eval = evaluateSolution();
+        System.out.println(eval);
+    }
+
+    private record Evaluation(double cost, int throughput) {}
+
+    private Evaluation evaluateSolution() {
+        double cost = 0.0;
+        for (SensorInfo sensor : sensoresInfoList)
+            cost += computeCost(sensor, sensor.getConectadoA());
+        
+        int throughput = 0;
+        for (SensorInfo sensor : sensoresInfoList)
+            if (sensor.getConectadoA() instanceof CentroInfo)
+                throughput += sensor.getThroughput();
+
+        return new Evaluation(cost, throughput);
+    }
+
+    private double computeCost(SensorInfo origen, Conectable destino) {
+        int dx = origen.getCoordX() - destino.getCoordX();
+        int dy = origen.getCoordY() - destino.getCoordY();
+        double d = Math.sqrt(dx*dx + dy*dy);
+        return d*d + origen.getThroughput();
     }
 
     // TODO: Implementar solucion mala + definir nombre
     // Solucion mala -- Nombre provisional
-    private void solucionMala() {return;}
+    private void solucionMala() {
+        boolean[] visited = new boolean[sensoresInfoList.length];
+        Conectable last = centrosInfoList[0];
+
+        for (int i = 0; i < sensoresInfoList.length; ++i) {
+            int candidate = -1;
+            double candidateCost = -1;
+            for (int j = 0; j < sensoresInfoList.length; ++j) {
+                if (!visited[j]) {
+                    double cost = computeCost(sensoresInfoList[j], last);
+                    if (cost > candidateCost) {
+                        candidateCost = cost;
+                        candidate = j;
+                    }
+                }
+            }
+
+            visited[candidate] = true;
+            sensoresInfoList[candidate].setConectadoA(last);
+            last = sensoresInfoList[candidate];
+        }
+    }
 
     // TODO: Implementar solucion buena + definir nombre
     //Solucion buena -- Nombre provisional
@@ -182,19 +218,15 @@ public class RedSensoresEstado {
         return sensoresInfoList[i].getConexionesRestantes();
     }
 
-    public Object sensorGetConectadoA(int i) {
+    public Conectable sensorGetConectadoA(int i) {
         return sensoresInfoList[i].getConectadoA();
     }
 
-    public void sensorUpdateCapacidadRestante(int i, int capacidadConexion) {
-        sensoresInfoList[i].updateCapacidadRestante(capacidadConexion);
+    public void sensorRecibirConexion(int i, int capacidad) {
+        sensoresInfoList[i].recibirConexion(capacidad);
     }
 
-    public void sensorRecibirConexion(int i) {
-        sensoresInfoList[i].recibirConexion();
-    }
-
-    public void sensorSetConectadoA(int i, Object conectadoA) {
+    public void sensorSetConectadoA(int i, Conectable conectadoA) {
         sensoresInfoList[i].setConectadoA(conectadoA);
     }
 
@@ -215,27 +247,17 @@ public class RedSensoresEstado {
         return centrosInfoList[i].getConexionesRestantes();
     }
 
-    public void centroUpdateCapacidadRestante(int i, int capacidadConexion) {
-        centrosInfoList[i].updateCapacidadRestante(capacidadConexion);
-    }
-
-    public void centroRecibirConexion(int i) {
-        centrosInfoList[i].recibirConexion();
+    public void centroRecibirConexion(int i, int capacidad) {
+        centrosInfoList[i].recibirConexion(capacidad);
     }
 
     //OPERADORES
-    public void cambiarConexion(int sensorOrigen, int sensorDestino) {
+    public void cambiarConexion(SensorInfo origen, Conectable destino) {
         //Eliminar la conexion antigua
-        Object conexionAntigua = sensoresInfoList[sensorOrigen].getConectadoA();
-        
-        if (conexionAntigua instanceof SensorInfo) {
-            ((SensorInfo) conexionAntigua).recibirDesonexion();
-        } else if (conexionAntigua instanceof CentroInfo) {
-            ((CentroInfo) conexionAntigua).recibirDesonexion();
-        }
+        origen.getConectadoA().recibirDesconexion(origen.getThroughput());
 
         //Establecer la nueva conexion
-        sensoresInfoList[sensorOrigen].setConectadoA(sensoresInfoList[sensorDestino]);
-        sensoresInfoList[sensorDestino].recibirConexion();
+        origen.setConectadoA(destino);
+        destino.recibirConexion(origen.getThroughput());
     }
 }

@@ -18,7 +18,7 @@ $(BIN_DIR)/%.class: $(SRC_DIR)/%.java | $(BIN_DIR)
 
 .PHONY: run
 run: all
-	java -cp $(BIN_DIR) redsensores/Main
+	java -cp $(CLASSPATH) redsensores/Main
 
 .PHONY: clean
 clean:
