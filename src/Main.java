@@ -3,6 +3,12 @@ package redsensores;
 import redsensores.RedSensoresEstado;
 import java.util.Scanner;
 
+import aima.search.framework.Problem;
+import aima.search.framework.Search;
+import aima.search.framework.SearchAgent;
+import aima.search.informed.HillClimbingSearch;
+import aima.search.informed.SimulatedAnnealingSearch;
+
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -20,7 +26,14 @@ public class Main {
         int semillaCentros = scanner.nextInt();
 
         System.out.print("Ingrese el modo de generación: ");
+        System.out.println("1. Solucion mala");
+        System.out.println("2. Solucion buena");
         int mode = scanner.nextInt();
+
+        System.out.print("Ingrese el tipo de algortimo: ");
+        System.out.println("1. Hill Climbing");
+        System.out.println("2. Simulated Annealing");
+        int alg = scanner.nextInt();
 
         scanner.close();
 
@@ -35,5 +48,32 @@ public class Main {
         for (int i = 0; i < numCentros; i++) {
             System.out.println("Centro de datos " + i + ": (" + redSensores.centroGetCoordX(i) + ", " + redSensores.centroGetCoordY(i) + ")" + " --> Capacidad restante: " + redSensores.centroGetCapacidadRestante(i) + " --> Conexiones restantes: " + redSensores.centroGetConexionesRestantes(i));
         }
+
+        Search hillClimbing = new HillClimbingSearch();
+
+        //steps: Cuánto tiempo se ejecuta el algoritmo.
+        //stiter: Cuántas iteraciones se hacen por nivel de temperatura.
+        //k: Controla la probabilidad de aceptar soluciones peores.
+        //lamb: Controla la velocidad de enfriamiento.
+        //TODO: Ver como afectan los parametros
+        Search simulatedAnnealing = new SimulatedAnnealingSearch(2000, 100, 5, 0.001); 
+        Problem p = new Problem (redSensores, new RedSensoresSuccessorFunction(), new RedSensoresGoalTest(), new RedSensoresHeuristicFunction());
+
+        SearchAgent agent = null;
+        try {
+            if (alg == 1) agent = new SearchAgent(p, hillClimbing);
+            else if (alg == 2)  agent = new SearchAgent(p, simulatedAnnealing);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        RedSensoresEstado finalState = null;
+
+        if (alg == 1) finalState = (RedSensoresEstado) hillClimbing.getGoalState();
+        else if (alg == 2) finalState = (RedSensoresEstado) simulatedAnnealing.getGoalState();
+
+        // TODO: Print the final state <- Implementar
+        //finalState.printSolution();
+
     }
 }
