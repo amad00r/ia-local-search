@@ -146,9 +146,9 @@ public class RedSensoresEstado {
         System.out.println(eval);
     }
 
-    private record Evaluation(double cost, int throughput) {}
+    public record Evaluation(double cost, int throughput) {}
 
-    private Evaluation evaluateSolution() {
+    public Evaluation evaluateSolution() {
         double cost = 0.0;
         for (SensorInfo sensor : sensoresInfoList)
             cost += computeCost(sensor, sensor.getConectadoA());
