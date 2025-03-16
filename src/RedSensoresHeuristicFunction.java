@@ -36,6 +36,7 @@ public class RedSensoresHeuristicFunction implements HeuristicFunction {
 
         //assumption greater heuristic value => HIGHER on hill; 0 == goal state;
         //HillClimbing invierte el signo de la heurística, necesitamos generar el caso contrario.
+        //Mismo para SimulatedAnnealing.
         switch (choice) {
             case 1:
                 return eval.throughput(); //Mejor solucion valor pequeño.
