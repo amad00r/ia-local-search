@@ -33,15 +33,18 @@ public class RedSensoresHeuristicFunction implements HeuristicFunction {
         //          - Buscamos valores cercanos a cero o positivos
         //Choice 4: - Alpha * Cost + Beta * Throughput (Maximize throughput and minimize cost) 
         //          - Buscamos valores cercanos a cero o positivos, ponderamos los valores
+
+        //assumption greater heuristic value => HIGHER on hill; 0 == goal state;
+        //HillClimbing invierte el signo de la heurística, necesitamos generar el caso contrario.
         switch (choice) {
             case 1:
-                return eval.throughput();
+                return eval.throughput(); //Mejor solucion valor pequeño.
             case 2:
-                return eval.cost();
+                return - eval.cost(); //Mejor solucion valor grande.
             case 3:
-                return (- eval.cost() + eval.throughput());
+                return - eval.cost() + eval.throughput(); //Mejor solucion valor cercano a cero.
             case 4:
-                return (- alpha * eval.cost() + beta * eval.throughput());
+                return - alpha * eval.cost() + beta * eval.throughput(); //Mejor solucion valor cercano a cero.
             default:
                 throw new IllegalStateException("Usad un numero entre 1 y 4");
         }   
