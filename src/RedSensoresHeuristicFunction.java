@@ -39,13 +39,15 @@ public class RedSensoresHeuristicFunction implements HeuristicFunction {
         //Mismo para SimulatedAnnealing.
         switch (choice) {
             case 1:
-                return eval.throughput(); //Mejor solucion valor pequeño.
+                System.out.println("Throughput: " + eval.throughput());
+                return - eval.throughput(); //Mejor solucion valor pequeño.
             case 2:
-                return - eval.cost(); //Mejor solucion valor grande.
+                System.out.println("Cost: " + eval.cost());
+                return eval.cost(); //Mejor solucion valor grande.
             case 3:
-                return - eval.cost() + eval.throughput(); //Mejor solucion valor cercano a cero.
+                return eval.cost() - eval.throughput(); //Mejor solucion valor cercano a cero.
             case 4:
-                return - alpha * eval.cost() + beta * eval.throughput(); //Mejor solucion valor cercano a cero.
+                return alpha * eval.cost() - beta * eval.throughput(); //Mejor solucion valor cercano a cero.
             default:
                 throw new IllegalStateException("Usad un numero entre 1 y 4");
         }   
