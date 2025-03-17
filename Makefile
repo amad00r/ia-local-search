@@ -3,6 +3,7 @@ BIN_DIR = bin
 
 CLASSES := \
 	$(BIN_DIR)/RedSensoresEstado.class \
+	$(BIN_DIR)/RedSensoresSuccessorFunction.class \
 	$(BIN_DIR)/Main.class
 
 CLASSPATH := $(BIN_DIR):lib/AIMA.jar:lib/RedSensores.jar
@@ -18,7 +19,7 @@ $(BIN_DIR)/%.class: $(SRC_DIR)/%.java | $(BIN_DIR)
 
 .PHONY: run
 run: all
-	java -cp $(CLASSPATH) redsensores/Main
+	java -ea -cp $(CLASSPATH) redsensores/Main
 
 .PHONY: clean
 clean:
