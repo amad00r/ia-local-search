@@ -139,8 +139,8 @@ public class RedSensoresEstado {
         }
 
         //Generar solucion inicial
-        if (mode == 0) solucionMala();
-        else if (mode == 1) solucionBuena();
+        if (mode == 1) solucionMala();
+        else if (mode == 2) solucionBuena();
 
         Evaluation eval = evaluateSolution();
         System.out.println(eval);

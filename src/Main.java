@@ -25,12 +25,12 @@ public class Main {
         System.out.print("Ingrese la semilla para los centros: ");
         int semillaCentros = scanner.nextInt();
 
-        System.out.print("Ingrese el modo de generación: ");
+        System.out.println("Ingrese el modo de generación: ");
         System.out.println("1. Solucion mala");
         System.out.println("2. Solucion buena");
         int mode = scanner.nextInt();
 
-        System.out.print("Ingrese el tipo de algortimo: ");
+        System.out.println("Ingrese el tipo de algortimo: ");
         System.out.println("1. Hill Climbing");
         System.out.println("2. Simulated Annealing");
         int alg = scanner.nextInt();
