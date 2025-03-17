@@ -86,16 +86,7 @@ public class RedSensoresEstado {
             int variacionThroughput = throughputActual - throughputAnterior;
 
             if (this.conectadoA != null) {
-                if (this.conectadoA instanceof CentroInfo) {
-                    //Si es un centro, solo envía la variación del throughput.
-                    if (variacionThroughput != 0) {
-                        this.conectadoA.updateCapacidadRestante(-variacionThroughput);
-                    }
-                }
-                else {
-                    //Si no es un centro, envía el incremento directamente.
-                    this.conectadoA.updateCapacidadRestante(incremento);
-                }
+                this.conectadoA.updateCapacidadRestante(-variacionThroughput);
             }
         }
 
