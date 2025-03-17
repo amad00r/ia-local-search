@@ -1,13 +1,18 @@
 package redsensores;
 
 import redsensores.RedSensoresEstado;
+import redsensores.RedSensoresEstado.SensorInfo;
+import redsensores.RedSensoresEstado.CentroInfo;
+import redsensores.RedSensoresSuccessorFunction;
 import java.util.Scanner;
 
+import aima.search.framework.Successor;
 import aima.search.framework.Problem;
 import aima.search.framework.Search;
 import aima.search.framework.SearchAgent;
 import aima.search.informed.HillClimbingSearch;
 import aima.search.informed.SimulatedAnnealingSearch;
+
 
 public class Main {
     public static void main(String[] args) {
@@ -26,28 +31,20 @@ public class Main {
         int semillaCentros = scanner.nextInt();
 
         System.out.println("Ingrese el modo de generación: ");
-        System.out.println("1. Solucion mala");
-        System.out.println("2. Solucion buena");
+        System.out.println("    1. Solucion mala");
+        System.out.println("    2. Solucion buena");
         int mode = scanner.nextInt();
 
         System.out.println("Ingrese el tipo de algortimo: ");
-        System.out.println("1. Hill Climbing");
-        System.out.println("2. Simulated Annealing");
+        System.out.println("    1. Hill Climbing");
+        System.out.println("    2. Simulated Annealing");
         int alg = scanner.nextInt();
 
         scanner.close();
 
         RedSensoresEstado redSensores = new RedSensoresEstado(numSensores, numCentros, semillaSensor, semillaCentros, mode);
-        
-        System.out.println("Coordenadas de los sensores:");
-        for (int i = 0; i < numSensores; i++) {
-            System.out.println("Sensor " + i + ": (" + redSensores.sensorGetCoordX(i) + ", " + redSensores.sensorGetCoordY(i) + ") -> Capacidad: " + redSensores.sensorGetCapacidad(i) + " --> Conexiones restantes: " + redSensores.sensorGetConexionesRestantes(i) + " --> Capacidad restante: " + redSensores.sensorGetCapacidadRestante(i));     
-        }
-        
-        System.out.println("Coordenadas de los centros de datos:");
-        for (int i = 0; i < numCentros; i++) {
-            System.out.println("Centro de datos " + i + ": (" + redSensores.centroGetCoordX(i) + ", " + redSensores.centroGetCoordY(i) + ")" + " --> Capacidad restante: " + redSensores.centroGetCapacidadRestante(i) + " --> Conexiones restantes: " + redSensores.centroGetConexionesRestantes(i));
-        }
+        System.out.println("Estado inicial:");
+        System.out.println(redSensores);
 
         Search hillClimbing = new HillClimbingSearch();
 
@@ -72,8 +69,7 @@ public class Main {
         if (alg == 1) finalState = (RedSensoresEstado) hillClimbing.getGoalState();
         else if (alg == 2) finalState = (RedSensoresEstado) simulatedAnnealing.getGoalState();
 
-        // TODO: Print the final state <- Implementar
-        //finalState.printSolution();
-
+        System.out.println("Estado Final:");
+        System.out.println(finalState);
     }
 }

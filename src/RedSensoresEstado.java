@@ -1,13 +1,15 @@
 package redsensores;
 
 import IA.Red.*;
-    
+import java.util.Arrays;
+import java.util.HashMap;
+
 public class RedSensoresEstado {
 
     // TODO: Como nos sabemos si los sensores estan conectados a algo o no? conectadoA != null?
     // TODO: Añadir cantidad de informacion a enviar?
 
-    private abstract class Conectable {
+    public abstract class Conectable {
         protected int capacidadRestante;
         protected int conexionesRestantes;
 
@@ -40,7 +42,7 @@ public class RedSensoresEstado {
         public abstract int getCoordY();
     }
 
-    private class SensorInfo extends Conectable {
+    public class SensorInfo extends Conectable {
         private Sensor sensor;
         private Conectable conectadoA; // Puede ser un Sensor o un Centro de Datos
 
@@ -48,6 +50,13 @@ public class RedSensoresEstado {
             super(capacidadRestante, conexionesRestantes);
             sensor = new Sensor(capacidad, cx, cy);
             this.conectadoA = conectadoA;
+        }
+
+        public SensorInfo(SensorInfo sensor) {
+            this(
+                sensor.getCapacidad(), sensor.getCoordX(), sensor.getCoordY(),
+                sensor.getCapacidadRestante(), sensor.getConexionesRestantes(),
+                sensor.getConectadoA());
         }
 
         public int getCapacidad() {
@@ -87,12 +96,18 @@ public class RedSensoresEstado {
         }
     }
 
-    private class CentroInfo extends Conectable {
+    public class CentroInfo extends Conectable {
         private Centro centro;
 
         public CentroInfo(int cx, int cy, int capacidadRestante, int conexionesRestantes) {
             super(capacidadRestante, conexionesRestantes);
             centro = new Centro(cx, cy);
+        }
+
+        public CentroInfo(CentroInfo centro) {
+            this(
+                centro.getCoordX(), centro.getCoordY(),
+                centro.getCapacidadRestante(), centro.getConexionesRestantes());
         }
 
         @Override
@@ -113,6 +128,50 @@ public class RedSensoresEstado {
     
     private SensorInfo[] sensoresInfoList;
     private CentroInfo[] centrosInfoList;
+
+    public int getNumSensores() {
+        return sensoresInfoList.length;
+    }
+
+    public int getNumCentros() {
+        return centrosInfoList.length;
+    }
+
+    public SensorInfo getSensorAt(int i) {
+        return sensoresInfoList[i];
+    }
+
+    public CentroInfo getCentroAt(int i) {
+        return centrosInfoList[i];
+    }
+
+    public RedSensoresEstado(RedSensoresEstado estado) {
+        int nSensores = estado.getNumSensores();
+        int nCentros = estado.getNumCentros();
+        sensoresInfoList = new SensorInfo[nSensores];
+        centrosInfoList = new CentroInfo[nCentros];
+
+        HashMap<Conectable, Conectable> newPtrs = new HashMap<>();
+
+        for (int i = 0; i < nSensores; ++i) {
+            SensorInfo newSensor = new SensorInfo(estado.getSensorAt(i));
+            newPtrs.put(estado.sensoresInfoList[i], newSensor);
+            sensoresInfoList[i] = newSensor;
+        }
+
+        for (int i = 0; i < nCentros; ++i) {
+            CentroInfo newCentro = new CentroInfo(estado.getCentroAt(i)); 
+            newPtrs.put(estado.centrosInfoList[i], newCentro);
+            centrosInfoList[i] = newCentro;
+        }
+
+        for (int i = 0; i < nSensores; ++i) {
+            Conectable conectadoA = sensoresInfoList[i].conectadoA;
+            if (conectadoA != null)
+                sensoresInfoList[i].conectadoA = newPtrs.get(conectadoA);
+        }
+    }
+
 
     public RedSensoresEstado(int nsens, int ncent, int seedSensor, int seedCentro, int mode) {
         sensoresInfoList = new SensorInfo[nsens];
@@ -197,62 +256,15 @@ public class RedSensoresEstado {
     //Solucion buena -- Nombre provisional
     private void solucionBuena() {return;}
 
-    // Getters y setters de los sensores
-    public int sensorGetCoordX(int i) {
-        return sensoresInfoList[i].getCoordX();
-    }
-
-    public int sensorGetCoordY(int i) {
-        return sensoresInfoList[i].getCoordY();
-    }
-
-    public int sensorGetCapacidad(int i) {
-        return (int) sensoresInfoList[i].getCapacidad();
-    }
-
-    public int sensorGetCapacidadRestante(int i) {
-        return sensoresInfoList[i].getCapacidadRestante();
-    }
-
-    public int sensorGetConexionesRestantes(int i) {
-        return sensoresInfoList[i].getConexionesRestantes();
-    }
-
-    public Conectable sensorGetConectadoA(int i) {
-        return sensoresInfoList[i].getConectadoA();
-    }
-
-    public void sensorRecibirConexion(int i, int capacidad) {
-        sensoresInfoList[i].recibirConexion(capacidad);
-    }
-
-    public void sensorSetConectadoA(int i, Conectable conectadoA) {
-        sensoresInfoList[i].setConectadoA(conectadoA);
-    }
-
-    // Getters y setters de los centros de datos
-    public int centroGetCoordX(int i) {
-        return centrosInfoList[i].getCoordX();
-    }
-
-    public int centroGetCoordY(int i) {
-        return centrosInfoList[i].getCoordY();
-    }
-
-    public int centroGetCapacidadRestante(int i) {
-        return centrosInfoList[i].getCapacidadRestante();
-    }
-
-    public int centroGetConexionesRestantes(int i) {
-        return centrosInfoList[i].getConexionesRestantes();
-    }
-
-    public void centroRecibirConexion(int i, int capacidad) {
-        centrosInfoList[i].recibirConexion(capacidad);
-    }
-
     //OPERADORES
     public void cambiarConexion(SensorInfo origen, Conectable nuevoDestino) {
+        assert 
+            Arrays.asList(sensoresInfoList).contains(nuevoDestino) ||
+            Arrays.asList(centrosInfoList).contains(nuevoDestino);
+        assert 
+            Arrays.asList(sensoresInfoList).contains(origen.getConectadoA()) ||
+            Arrays.asList(centrosInfoList).contains(origen.getConectadoA());
+
         //Eliminar la conexion antigua
         origen.getConectadoA().recibirDesconexion(origen.getThroughput());
 
@@ -261,9 +273,40 @@ public class RedSensoresEstado {
         nuevoDestino.recibirConexion(origen.getThroughput());
     }
 
-    public void intercambiarConexion (SensorInfo sensorA, SensorInfo sensorB) {
+    public void intercambiarConexion(SensorInfo sensorA, SensorInfo sensorB) {        
         Conectable aux = sensorA.getConectadoA();
         cambiarConexion(sensorA, sensorB.getConectadoA());
         cambiarConexion(sensorB, aux);
+    }
+
+    public String toString() {
+        String ret = "";
+
+        for (int i = 0; i < sensoresInfoList.length; i++) {
+            SensorInfo sensor = sensoresInfoList[i];
+            ret +=
+                "(Sensor[" + i + "], Coords = (" + sensor.getCoordX() + ", " + sensor.getCoordY() +
+                "), Capacidad = " + sensor.getCapacidad() +
+                ", Capacidad restante = " + sensor.getCapacidadRestante() +
+                ", Conexiones restantes = " + sensor.getConexionesRestantes() +
+                ") -> ";
+            
+            if (sensor.getConectadoA() instanceof SensorInfo)
+                ret += "Sensor[" + Arrays.asList(sensoresInfoList).indexOf((SensorInfo)sensor.getConectadoA()) + "]\n";
+            else
+                ret += "Centro[" + Arrays.asList(centrosInfoList).indexOf((CentroInfo)sensor.getConectadoA()) + "]\n";
+        }
+
+        for (int i = 0; i < centrosInfoList.length; i++) {
+            CentroInfo centro = centrosInfoList[i];
+            ret +=
+                "(Centro[" + i + "], Coords = (" + centro.getCoordX() + ", " + centro.getCoordY() +
+                "), Capacidad restante = " + centro.getCapacidadRestante() +
+                ", Conexiones restantes = " + centro.getConexionesRestantes() + ")\n";
+        }
+
+        ret += evaluateSolution().toString();
+
+        return ret;
     }
 }
