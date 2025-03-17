@@ -305,6 +305,8 @@ public class RedSensoresEstado {
                 ", Conexiones restantes = " + centro.getConexionesRestantes() + ")\n";
         }
 
+        ret += evaluateSolution().toString();
+
         return ret;
     }
 }

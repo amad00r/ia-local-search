@@ -46,12 +46,6 @@ public class Main {
         System.out.println("Estado inicial:");
         System.out.println(redSensores);
 
-        RedSensoresSuccessorFunction successorFn = new RedSensoresSuccessorFunction();
-        for (Successor successor : successorFn.getSuccessors(redSensores)) {
-            System.out.println("Sucessor `" + successor.getAction() + "`");
-            System.out.println((RedSensoresEstado)successor.getState());
-        }
-
         Search hillClimbing = new HillClimbingSearch();
 
         //steps: Cuánto tiempo se ejecuta el algoritmo.
@@ -75,8 +69,7 @@ public class Main {
         if (alg == 1) finalState = (RedSensoresEstado) hillClimbing.getGoalState();
         else if (alg == 2) finalState = (RedSensoresEstado) simulatedAnnealing.getGoalState();
 
-        // TODO: Print the final state <- Implementar
-        //finalState.printSolution();
-
+        System.out.println("Estado Final:");
+        System.out.println(finalState);
     }
 }
