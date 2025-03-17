@@ -235,7 +235,7 @@ public class RedSensoresEstado {
         int dx = origen.getCoordX() - destino.getCoordX();
         int dy = origen.getCoordY() - destino.getCoordY();
         double d = Math.sqrt(dx*dx + dy*dy);
-        return d*d + origen.getThroughput();
+        return d*d * origen.getThroughput();
     }
 
     // TODO: Implementar solucion mala + definir nombre
