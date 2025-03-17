@@ -80,9 +80,23 @@ public class RedSensoresEstado {
 
         @Override
         public void updateCapacidadRestante(int incremento) {
-            this.capacidadRestante += incremento;
-            if (this.conectadoA != null)
-                this.conectadoA.updateCapacidadRestante(incremento);
+            int throughputAnterior = getThroughput();    //Antes
+            this.capacidadRestante += incremento;        //Cambio
+            int throughputActual = getThroughput();      //Despues
+            int variacionThroughput = throughputActual - throughputAnterior;
+
+            if (this.conectadoA != null) {
+                if (this.conectadoA instanceof CentroInfo) {
+                    //Si es un centro, solo envía la variación del throughput.
+                    if (variacionThroughput != 0) {
+                        this.conectadoA.updateCapacidadRestante(-variacionThroughput);
+                    }
+                }
+                else {
+                    //Si no es un centro, envía el incremento directamente.
+                    this.conectadoA.updateCapacidadRestante(incremento);
+                }
+            }
         }
 
         @Override
@@ -200,9 +214,6 @@ public class RedSensoresEstado {
         //Generar solucion inicial
         if (mode == 1) solucionMala();
         else if (mode == 2) solucionBuena();
-
-        Evaluation eval = evaluateSolution();
-        System.out.println(eval);
     }
 
     public record Evaluation(double cost, int throughput) {}
@@ -289,6 +300,7 @@ public class RedSensoresEstado {
                 "), Capacidad = " + sensor.getCapacidad() +
                 ", Capacidad restante = " + sensor.getCapacidadRestante() +
                 ", Conexiones restantes = " + sensor.getConexionesRestantes() +
+                ", Throughput = " + sensor.getThroughput() +
                 ") -> ";
             
             if (sensor.getConectadoA() instanceof SensorInfo)
