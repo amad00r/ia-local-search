@@ -4,6 +4,8 @@ BIN_DIR = bin
 CLASSES := \
 	$(BIN_DIR)/RedSensoresEstado.class \
 	$(BIN_DIR)/RedSensoresSuccessorFunction.class \
+	$(BIN_DIR)/RedSensoresGoalTest.class \
+	$(BIN_DIR)/RedSensoresHeuristicFunction.class \
 	$(BIN_DIR)/Main.class
 
 CLASSPATH := $(BIN_DIR):lib/AIMA.jar:lib/RedSensores.jar
