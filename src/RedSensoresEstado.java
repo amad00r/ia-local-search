@@ -205,8 +205,8 @@ public class RedSensoresEstado {
         //Generar centros de datos con la info extra
         CentrosDatos auxCentros = new CentrosDatos(ncent, seedCentro);
         for (int i = 0; i < ncent; i++) {
-            centrosInfoList[i] = new CentroInfo(auxSensores.get(i).getCoordX(), 
-                                                auxSensores.get(i).getCoordY(), 
+            centrosInfoList[i] = new CentroInfo(auxCentros.get(i).getCoordX(), 
+                                                auxCentros.get(i).getCoordY(), 
                                                 150, 
                                                 25);
         }
@@ -276,12 +276,15 @@ public class RedSensoresEstado {
             Arrays.asList(sensoresInfoList).contains(origen.getConectadoA()) ||
             Arrays.asList(centrosInfoList).contains(origen.getConectadoA());
 
-        //Eliminar la conexion antigua
-        origen.getConectadoA().recibirDesconexion(origen.getThroughput());
+        //Eliminar la conexion antigua 
+        // !!NO HACE FALTA IMPLICITO EN SET CONECTADO
+        // origen.getConectadoA().recibirDesconexion(origen.getThroughput());
 
         //Establecer la nueva conexion
         origen.setConectadoA(nuevoDestino);
-        nuevoDestino.recibirConexion(origen.getThroughput());
+
+        // !!NO HACE FALTA IMPLICITO EN SET CONECTADO
+        //nuevoDestino.recibirConexion(origen.getThroughput());
     }
 
     public void intercambiarConexion(SensorInfo sensorA, SensorInfo sensorB) {        
