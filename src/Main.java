@@ -57,12 +57,24 @@ public class Main {
         Problem p = new Problem (redSensores, new RedSensoresSuccessorFunction(), new RedSensoresGoalTest(), new RedSensoresHeuristicFunction());
 
         SearchAgent agent = null;
+
+        System.out.println("Empieza la busqueda... ");
+
         try {
+            
+            long startTime = System.currentTimeMillis();
+            
             if (alg == 1) agent = new SearchAgent(p, hillClimbing);
-            else if (alg == 2)  agent = new SearchAgent(p, simulatedAnnealing);
+            else if (alg == 2) agent = new SearchAgent(p, simulatedAnnealing);
+            
+            long endTime = System.currentTimeMillis();
+            System.out.println("Tiempo de ejecución: " + (endTime - startTime) + " ms");
+
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        System.out.println("Termina la busqueda!");
 
         RedSensoresEstado finalState = null;
 
