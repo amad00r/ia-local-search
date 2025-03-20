@@ -214,10 +214,11 @@ public class RedSensoresEstado {
         for (SensorInfo sensor : sensoresInfoList)
             cost += computeCost(sensor, sensor.getConectadoA());
         
+
         int throughput = 0;
-        for (SensorInfo sensor : sensoresInfoList)
-            if (sensor.getConectadoA() instanceof CentroInfo)
-                throughput += sensor.getThroughput();
+        
+        for (CentroInfo centro : centrosInfoList)
+            throughput += 150 - Math.max(centro.getCapacidadRestante(),0);
 
         return new Evaluation(cost, throughput);
     }

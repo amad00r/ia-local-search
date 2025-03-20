@@ -8,8 +8,14 @@ import redsensores.RedSensoresEstado;
 public class RedSensoresHeuristicFunction implements HeuristicFunction {
 
     private int choice = 1;
+    
+    //Experimento extra
     private double alpha = 1;
-    private double beta = 1;
+    private double beta = 2000;
+
+    //Experimento practica
+    private double alpha2 = 1;
+    private double beta2 = 2000;
 
     public void changeHeuristicFunction(int newChoice) {
         choice = newChoice;
@@ -46,6 +52,8 @@ public class RedSensoresHeuristicFunction implements HeuristicFunction {
                 return eval.cost() - eval.throughput(); //Mejor solucion valor cercano a cero.
             case 4:
                 return alpha * eval.cost() - beta * eval.throughput(); //Mejor solucion valor cercano a cero.
+            case 5:
+                return alpha2 * eval.cost() - beta2 * eval.throughput();
             default:
                 throw new IllegalStateException("Usad un numero entre 1 y 4");
         }   
