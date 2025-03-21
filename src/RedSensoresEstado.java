@@ -442,9 +442,8 @@ public class RedSensoresEstado {
             totalFlow += newFlow[sink];
         }
 
-        System.out.println("Flow Total = " + totalFlow);
-        System.out.println("Costo Total = " + totalCost);
-
+        // System.out.println("Flow Total = " + totalFlow);
+        // System.out.println("Costo Total = " + totalCost);
     }
 
     //OPERADORES

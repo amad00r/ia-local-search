@@ -6,7 +6,8 @@ CLASSES := \
 	$(BIN_DIR)/RedSensoresSuccessorFunction.class \
 	$(BIN_DIR)/RedSensoresGoalTest.class \
 	$(BIN_DIR)/RedSensoresHeuristicFunction.class \
-	$(BIN_DIR)/Main.class
+	$(BIN_DIR)/Main.class \
+	$(BIN_DIR)/ExperimentsMain.class
 
 CLASSPATH := $(BIN_DIR):lib/AIMA.jar:lib/RedSensores.jar
 
@@ -14,14 +15,18 @@ CLASSPATH := $(BIN_DIR):lib/AIMA.jar:lib/RedSensores.jar
 all: $(CLASSES)
 
 $(BIN_DIR):
-	mkdir -p $(BIN_DIR)
+	@mkdir -p $(BIN_DIR)
 
 $(BIN_DIR)/%.class: $(SRC_DIR)/%.java | $(BIN_DIR)
-	javac -cp $(CLASSPATH) -d $(BIN_DIR) $<
+	@javac -cp $(CLASSPATH) -d $(BIN_DIR) $<
 
 .PHONY: run
 run: all
-	java -ea -cp $(CLASSPATH) redsensores/Main
+	@java -ea -cp $(CLASSPATH) redsensores/Main
+
+.PHONY: run-experiment
+run-experiment: all
+	@java -ea -cp $(CLASSPATH) redsensores/ExperimentsMain $(ARGS)
 
 .PHONY: clean
 clean:

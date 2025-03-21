@@ -53,8 +53,10 @@ public class Main {
         //k: Controla la probabilidad de aceptar soluciones peores.
         //lamb: Controla la velocidad de enfriamiento.
         //TODO: Ver como afectan los parametros
+        RedSensoresSuccessorFunction successorFn = new RedSensoresSuccessorFunction();
+        successorFn.enableAll();
         Search simulatedAnnealing = new SimulatedAnnealingSearch(2000, 100, 5, 0.001); 
-        Problem p = new Problem (redSensores, new RedSensoresSuccessorFunction(), new RedSensoresGoalTest(), new RedSensoresHeuristicFunction());
+        Problem p = new Problem (redSensores, successorFn, new RedSensoresGoalTest(), new RedSensoresHeuristicFunction());
 
         SearchAgent agent = null;
 
