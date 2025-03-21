@@ -8,20 +8,30 @@ import aima.search.framework.SearchAgent;
 
 public class ExperimentsMain {
     private static void usage() {
-        System.err.println("Usage:make run-experiment ARGS=<num-experimento>");
+        System.err.println("""
+            Usage:
+                make run-experiment ARGS="1"
+                make run-experiment ARGS="8 <alpha-low> <alpha-up> <alpha-step>"
+            """
+        );
         System.exit(1);
     }
 
     public static void main(String[] args) {
-        if (args.length != 1) usage();
+        if (args.length == 0) usage();
 
         int numExperimento = Integer.parseInt(args[0]);
         switch (numExperimento) {
         case 1:
+            if (args.length != 1) usage();
             try { experimento1(); } catch (Exception e) { e.printStackTrace(); }
             break;
         case 8:
-            try { experimento8(); } catch (Exception e) { e.printStackTrace(); }
+            if (args.length != 4) usage();
+            double alphaLow = Double.parseDouble(args[1]);
+            double alphaUp = Double.parseDouble(args[2]);
+            double alphaStep = Double.parseDouble(args[3]);
+            try { experimento8(alphaLow, alphaUp, alphaStep); } catch (Exception e) { e.printStackTrace(); }
             break;
         default:
             throw new UnsupportedOperationException(String.format("el experimento `%d` no está implementado", numExperimento));
@@ -85,7 +95,7 @@ public class ExperimentsMain {
     }
 
 
-    private static void experimento8() throws Exception {
+    private static void experimento8(double alphaLow, double alphaUp, double alphaStep) throws Exception {
         // TODO: el parámetro de la solución inicial lo tenemos que sacar experimentalmente con los experimentos 1 y 2
         // Temporalmente será la solución inicial mala
         RedSensoresSuccessorFunction successorFn = new RedSensoresSuccessorFunction();
@@ -100,7 +110,7 @@ public class ExperimentsMain {
         // Cabecera del CSV
         System.out.println("n_sensores, n_centros, sensores_seed, centros_seed, mala1_buena2, algorithm, alpha, time_ms, solution_cost, solution_throughput");
 
-        for (double alpha = 0.0; alpha <= 1.0; alpha += 0.1) {
+        for (double alpha = alphaLow; alpha <= alphaUp; alpha += alphaStep) {
             heuristicFn.setAlpha(alpha);
 
             for (int i = 0; i < 10; ++i) {
