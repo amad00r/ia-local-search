@@ -5,6 +5,7 @@ import aima.search.informed.HillClimbingSearch;
 import aima.search.framework.Problem;
 import aima.search.framework.SearchAgent;
 
+import java.util.Locale;
 
 public class ExperimentsMain {
     private static void usage() {
@@ -82,7 +83,7 @@ public class ExperimentsMain {
 
         RedSensoresEstado.Evaluation eval = ((RedSensoresEstado)searchAlgorithm.getGoalState()).evaluateSolution();
 
-        System.out.println(String.format(
+        System.out.println(String.format(Locale.US,
             "100, 4, 4321, 1234, 1, hill-climbing, %f, %d, %d, %d, %s",
             0.1, end - start, eval.cost(), eval.throughput(), operatorsNames));
     }
@@ -117,7 +118,7 @@ public class ExperimentsMain {
 
             RedSensoresEstado.Evaluation eval = ((RedSensoresEstado)searchAlgorithm.getGoalState()).evaluateSolution();
 
-            System.out.println(String.format(
+            System.out.println(String.format(Locale.US,
                 "100, 4, 4321, 1234, %d, hill-climbing, %f, %d, %d, %d, cambiarConexion + intercambiarConexion",
                 initialSolution, 0.1, end - start, eval.cost(), eval.throughput()));
         }
@@ -151,7 +152,7 @@ public class ExperimentsMain {
 
                 RedSensoresEstado.Evaluation eval = ((RedSensoresEstado)searchAlgorithm.getGoalState()).evaluateSolution();
 
-                System.out.println(String.format(
+                System.out.println(String.format(Locale.US,
                     "100, 4, 4321, 1234, 1, hill-climbing, %f, %d, %d, %d",
                     alpha, end - start, eval.cost(), eval.throughput()));
             }
