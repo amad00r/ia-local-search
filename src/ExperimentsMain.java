@@ -6,6 +6,7 @@ import aima.search.framework.Problem;
 import aima.search.framework.SearchAgent;
 
 import java.util.Locale;
+import java.util.Random;
 
 public class ExperimentsMain {
 
@@ -48,12 +49,12 @@ public class ExperimentsMain {
     }
 
 
-    private static void experimento1_rec(String[] operators, int idx) throws Exception {
+    private static void experimento1_rec(int[] sensoresSeeds, int[] centrosSeeds, String[] operators, int idx) throws Exception {
         if (idx < operators.length) {
-            experimento1_rec(operators, idx + 1);
+            experimento1_rec(sensoresSeeds, centrosSeeds, operators, idx + 1);
             String op = operators[idx];
             operators[idx] = null;
-            experimento1_rec(operators, idx + 1);
+            experimento1_rec(sensoresSeeds, centrosSeeds, operators, idx + 1);
             operators[idx] = op;
             return;
         }
@@ -78,17 +79,19 @@ public class ExperimentsMain {
 
         Search searchAlgorithm = new HillClimbingSearch();
 
-        Problem problem = new Problem(new RedSensoresEstado(100, 4, 69, 96, 1), successorFn, goalTest, heuristicFn);
+        for (int i = 0; i < sensoresSeeds.length; ++i) {
+            Problem problem = new Problem(new RedSensoresEstado(100, 4, sensoresSeeds[i], centrosSeeds[i], 1), successorFn, goalTest, heuristicFn);
 
-        long start = System.currentTimeMillis();
-        SearchAgent agent = new SearchAgent(problem, searchAlgorithm);
-        long end = System.currentTimeMillis();
+            long start = System.currentTimeMillis();
+            SearchAgent agent = new SearchAgent(problem, searchAlgorithm);
+            long end = System.currentTimeMillis();
 
-        RedSensoresEstado.Evaluation eval = ((RedSensoresEstado)searchAlgorithm.getGoalState()).evaluateSolution();
+            RedSensoresEstado.Evaluation eval = ((RedSensoresEstado)searchAlgorithm.getGoalState()).evaluateSolution();
 
-        System.out.println(String.format(Locale.US,
-            "100; 4; 4321; 1234; 1; hill-climbing; %f; %d; %d; %d; %s",
-            alphaTest, end - start, eval.cost(), eval.throughput(), operatorsNames));
+            System.out.println(String.format(Locale.US,
+                "100; 4; %d; %d; 1; hill-climbing; %f; %d; %d; %d; %s",
+                sensoresSeeds[i], centrosSeeds[i], alphaTest, end - start, eval.cost(), eval.throughput(), operatorsNames));
+        }
     }
 
     private static void experimento1() throws Exception {
@@ -96,7 +99,7 @@ public class ExperimentsMain {
 
         // Cabecera del CSV
         System.out.println("n_sensores; n_centros; sensores_seed; centros_seed; mala1_buena2; algorithm; alpha; time_ms; solution_cost; solution_throughput; operators");
-        experimento1_rec(operators, 0);
+        experimento1_rec((new Random()).ints().limit(10).toArray(), (new Random()).ints().limit(10).toArray(), operators, 0);
     }
 
     private static void experimento2() throws Exception {
@@ -140,13 +143,17 @@ public class ExperimentsMain {
         RedSensoresHeuristicFunction heuristicFn = new RedSensoresHeuristicFunction();
         Search searchAlgorithm = new HillClimbingSearch();
 
+        int[] sensoresSeeds = (new Random()).ints().limit(10).toArray();
+        int[] centrosSeeds = (new Random()).ints().limit(sensoresSeeds.length).toArray();
+
         // Cabecera del CSV
         System.out.println("n_sensores; n_centros; sensores_seed; centros_seed; mala1_buena2; algorithm; alpha; time_ms; solution_cost; solution_throughput");
 
         for (double alpha = alphaLow; alpha <= alphaUp; alpha += alphaStep) {
             heuristicFn.setAlpha(alpha);
 
-            for (int i = 0; i < 10; ++i) {
+            for (int i = 0; i < sensoresSeeds.length; ++i) {
+                //TODO finish randoms
                 Problem problem = new Problem(new RedSensoresEstado(100, 4, 4321, 1234, 1), successorFn, goalTest, heuristicFn);
 
                 long start = System.currentTimeMillis();
