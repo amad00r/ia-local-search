@@ -149,7 +149,7 @@ public class ExperimentsMain {
 
         heuristicFn.setAlpha(alphaTest);
 
-        Problem problem = new Problem(new RedSensoresEstado(100, 4, 4321, 1234, 1), successorFn, new RedSensoresGoalTest(), heuristicFn);
+        Problem problem = new Problem(new RedSensoresEstado(100, 4, 4321, 1234, 2), successorFn, new RedSensoresGoalTest(), heuristicFn);
 
         long start = System.currentTimeMillis();
         SearchAgent agent = new SearchAgent(problem, searchAlgorithm);
@@ -158,7 +158,7 @@ public class ExperimentsMain {
         RedSensoresEstado.Evaluation eval = ((RedSensoresEstado)searchAlgorithm.getGoalState()).evaluateSolution();
 
         System.out.println(String.format(Locale.US,
-            "100; 4; 4321; 1234; 1; hill-climbing; %f; %d; %d; %d",
+            "100; 4; 4321; 1234; 2; hill-climbing; %f; %d; %d; %d",
             alphaTest, end - start, eval.cost(), eval.throughput()));
     }
 }
