@@ -8,6 +8,9 @@ import aima.search.framework.SearchAgent;
 import java.util.Locale;
 
 public class ExperimentsMain {
+
+    private static double alphaTest = 0.005;
+
     private static void usage() {
         System.err.println("""
             Usage:
@@ -71,7 +74,7 @@ public class ExperimentsMain {
 
         RedSensoresHeuristicFunction heuristicFn = new RedSensoresHeuristicFunction();
         RedSensoresGoalTest goalTest = new RedSensoresGoalTest();
-        heuristicFn.setAlpha(0.1);
+        heuristicFn.setAlpha(alphaTest);
 
         Search searchAlgorithm = new HillClimbingSearch();
 
@@ -85,7 +88,7 @@ public class ExperimentsMain {
 
         System.out.println(String.format(Locale.US,
             "100; 4; 4321; 1234; 1; hill-climbing; %f; %d; %d; %d; %s",
-            0.1, end - start, eval.cost(), eval.throughput(), operatorsNames));
+            alphaTest, end - start, eval.cost(), eval.throughput(), operatorsNames));
     }
 
     private static void experimento1() throws Exception {
