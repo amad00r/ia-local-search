@@ -17,6 +17,7 @@ public class ExperimentsMain {
             Usage:
                 make run-experiment ARGS="1"
                 make run-experiment ARGS="2"
+                make run-experiment ARGS="7 <alpha-low> <alpha-up> <alpha-step>"
                 make run-experiment ARGS="8"
             """
         );
@@ -35,6 +36,13 @@ public class ExperimentsMain {
         case 2:
             if (args.length != 1) usage();
             try { experimento2(); } catch (Exception e) { e.printStackTrace(); }
+            break;
+        case 7:
+            if (args.length != 4) usage();
+            double alphaLow = Double.parseDouble(args[1]);
+            double alphaUp = Double.parseDouble(args[2]);
+            double alphaStep = Double.parseDouble(args[3]);
+            try { experimento7(alphaLow, alphaUp, alphaStep); } catch (Exception e) { e.printStackTrace(); }
             break;
         case 8:
             if (args.length != 1) usage();
@@ -132,12 +140,42 @@ public class ExperimentsMain {
         }
     }
 
+    private static void experimento7(double alphaLow, double alphaUp, double alphaStep) throws Exception {
+        RedSensoresSuccessorFunction successorFn = new RedSensoresSuccessorFunction();
+        successorFn.enableCambiarConexion();
+        successorFn.enableIntercambiarConexion();
+
+        RedSensoresGoalTest goalTest = new RedSensoresGoalTest();
+        RedSensoresHeuristicFunction heuristicFn = new RedSensoresHeuristicFunction();
+        Search searchAlgorithm = new HillClimbingSearch();
+
+        int[] sensoresSeeds = (new Random()).ints().limit(10).toArray();
+        int[] centrosSeeds = (new Random()).ints().limit(sensoresSeeds.length).toArray();
+
+        // Cabecera del CSV
+        System.out.println("n_sensores; n_centros; sensores_seed; centros_seed; mala1_buena2; algorithm; alpha; time_ms; solution_cost; solution_throughput; operators");
+
+        for (double alpha = alphaLow; alpha <= alphaUp; alpha += alphaStep) {
+            heuristicFn.setAlpha(alpha);
+
+            for (int i = 0; i < sensoresSeeds.length; ++i) {
+                Problem problem = new Problem(new RedSensoresEstado(100, 2, sensoresSeeds[i], centrosSeeds[i], 1), successorFn, goalTest, heuristicFn);
+
+                long start = System.currentTimeMillis();
+                SearchAgent agent = new SearchAgent(problem, searchAlgorithm);
+                long end = System.currentTimeMillis();
+
+                RedSensoresEstado.Evaluation eval = ((RedSensoresEstado)searchAlgorithm.getGoalState()).evaluateSolution();
+
+                System.out.println(String.format(Locale.US,
+                    "100; 2; %d; %d; 1; hill-climbing; %f; %d; %d; %d; cambiarConexion + intercambiarConexion",
+                    sensoresSeeds[i], centrosSeeds[i], alpha, end - start, eval.cost(), eval.throughput()));
+            }
+        }
+    }
 
     private static void experimento8() throws Exception {
-        // TODO: el parámetro de la solución inicial lo tenemos que sacar experimentalmente con los experimentos 1 y 2
-        // Temporalmente será la solución inicial mala
         RedSensoresSuccessorFunction successorFn = new RedSensoresSuccessorFunction();
-        // TODO: confirmar que usamos estos operadores
         successorFn.enableCambiarConexion();
         successorFn.enableIntercambiarConexion();
 
