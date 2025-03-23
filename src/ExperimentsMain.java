@@ -84,7 +84,7 @@ public class ExperimentsMain {
         RedSensoresEstado.Evaluation eval = ((RedSensoresEstado)searchAlgorithm.getGoalState()).evaluateSolution();
 
         System.out.println(String.format(Locale.US,
-            "100, 4, 4321, 1234, 1, hill-climbing, %f, %d, %d, %d, %s",
+            "100; 4; 4321; 1234; 1; hill-climbing; %f; %d; %d; %d; %s",
             0.1, end - start, eval.cost(), eval.throughput(), operatorsNames));
     }
 
@@ -92,13 +92,13 @@ public class ExperimentsMain {
         String[] operators = { "cambiarConexion", "intercambiarConexion" };
 
         // Cabecera del CSV
-        System.out.println("n_sensores, n_centros, sensores_seed, centros_seed, mala1_buena2, algorithm, alpha, time_ms, solution_cost, solution_throughput, operators");
+        System.out.println("n_sensores; n_centros; sensores_seed; centros_seed; mala1_buena2; algorithm; alpha; time_ms; solution_cost; solution_throughput; operators");
         experimento1_rec(operators, 0);
     }
 
     private static void experimento2() throws Exception {
         // Cabecera del CSV
-        System.out.println("n_sensores, n_centros, sensores_seed, centros_seed, mala1_buena2, algorithm, alpha, time_ms, solution_cost, solution_throughput, operators");
+        System.out.println("n_sensores; n_centros; sensores_seed; centros_seed; mala1_buena2; algorithm; alpha; time_ms; solution_cost; solution_throughput; operators");
 
         RedSensoresSuccessorFunction successorFn = new RedSensoresSuccessorFunction();
         successorFn.enableCambiarConexion();
@@ -119,7 +119,7 @@ public class ExperimentsMain {
             RedSensoresEstado.Evaluation eval = ((RedSensoresEstado)searchAlgorithm.getGoalState()).evaluateSolution();
 
             System.out.println(String.format(Locale.US,
-                "100, 4, 4321, 1234, %d, hill-climbing, %f, %d, %d, %d, cambiarConexion + intercambiarConexion",
+                "100; 4; 4321; 1234; %d; hill-climbing; %f; %d; %d; %d; cambiarConexion + intercambiarConexion",
                 initialSolution, 0.1, end - start, eval.cost(), eval.throughput()));
         }
     }
@@ -138,7 +138,7 @@ public class ExperimentsMain {
         Search searchAlgorithm = new HillClimbingSearch();
 
         // Cabecera del CSV
-        System.out.println("n_sensores, n_centros, sensores_seed, centros_seed, mala1_buena2, algorithm, alpha, time_ms, solution_cost, solution_throughput");
+        System.out.println("n_sensores; n_centros; sensores_seed; centros_seed; mala1_buena2; algorithm; alpha; time_ms; solution_cost; solution_throughput");
 
         for (double alpha = alphaLow; alpha <= alphaUp; alpha += alphaStep) {
             heuristicFn.setAlpha(alpha);
@@ -153,7 +153,7 @@ public class ExperimentsMain {
                 RedSensoresEstado.Evaluation eval = ((RedSensoresEstado)searchAlgorithm.getGoalState()).evaluateSolution();
 
                 System.out.println(String.format(Locale.US,
-                    "100, 4, 4321, 1234, 1, hill-climbing, %f, %d, %d, %d",
+                    "100; 4; 4321; 1234; 1; hill-climbing; %f; %d; %d; %d",
                     alpha, end - start, eval.cost(), eval.throughput()));
             }
         }
