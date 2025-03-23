@@ -108,22 +108,27 @@ public class ExperimentsMain {
         successorFn.enableIntercambiarConexion();
         RedSensoresHeuristicFunction heuristicFn = new RedSensoresHeuristicFunction();
         RedSensoresGoalTest goalTest = new RedSensoresGoalTest();
-        heuristicFn.setAlpha(0.1);
+        heuristicFn.setAlpha(alphaTest);
 
         Search searchAlgorithm = new HillClimbingSearch();
 
+        int[] sensoresSeeds = (new Random()).ints().limit(10).toArray();
+        int[] centrosSeeds = (new Random()).ints().limit(sensoresSeeds.length).toArray();
+
         for (int initialSolution = 1; initialSolution <= 2; ++initialSolution) {
-            Problem problem = new Problem(new RedSensoresEstado(100, 4, 69, 96, initialSolution), successorFn, goalTest, heuristicFn);
+            for (int i = 0; i < sensoresSeeds.length; ++i) {
+                Problem problem = new Problem(new RedSensoresEstado(100, 4, sensoresSeeds[i], centrosSeeds[i], initialSolution), successorFn, goalTest, heuristicFn);
 
-            long start = System.currentTimeMillis();
-            SearchAgent agent = new SearchAgent(problem, searchAlgorithm);
-            long end = System.currentTimeMillis();
+                long start = System.currentTimeMillis();
+                SearchAgent agent = new SearchAgent(problem, searchAlgorithm);
+                long end = System.currentTimeMillis();
 
-            RedSensoresEstado.Evaluation eval = ((RedSensoresEstado)searchAlgorithm.getGoalState()).evaluateSolution();
+                RedSensoresEstado.Evaluation eval = ((RedSensoresEstado)searchAlgorithm.getGoalState()).evaluateSolution();
 
-            System.out.println(String.format(Locale.US,
-                "100; 4; 4321; 1234; %d; hill-climbing; %f; %d; %d; %d; cambiarConexion + intercambiarConexion",
-                initialSolution, 0.1, end - start, eval.cost(), eval.throughput()));
+                System.out.println(String.format(Locale.US,
+                    "100; 4; %d; %d; %d; hill-climbing; %f; %d; %d; %d; cambiarConexion + intercambiarConexion",
+                    sensoresSeeds[i], centrosSeeds[i], initialSolution, alphaTest, end - start, eval.cost(), eval.throughput()));
+            }
         }
     }
 
