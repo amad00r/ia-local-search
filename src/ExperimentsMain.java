@@ -83,7 +83,7 @@ public class ExperimentsMain {
         RedSensoresEstado.Evaluation eval = ((RedSensoresEstado)searchAlgorithm.getGoalState()).evaluateSolution();
 
         System.out.println(String.format(
-            "100, 4, 4321, 1234, 1, hill-climbing, %f, %d, %f, %d, %s",
+            "100, 4, 4321, 1234, 1, hill-climbing, %f, %d, %d, %d, %s",
             0.1, end - start, eval.cost(), eval.throughput(), operatorsNames));
     }
 
@@ -118,7 +118,7 @@ public class ExperimentsMain {
             RedSensoresEstado.Evaluation eval = ((RedSensoresEstado)searchAlgorithm.getGoalState()).evaluateSolution();
 
             System.out.println(String.format(
-                "100, 4, 4321, 1234, %d, hill-climbing, %f, %d, %f, %d, cambiarConexion + intercambiarConexion",
+                "100, 4, 4321, 1234, %d, hill-climbing, %f, %d, %d, %d, cambiarConexion + intercambiarConexion",
                 initialSolution, 0.1, end - start, eval.cost(), eval.throughput()));
         }
     }
@@ -152,7 +152,7 @@ public class ExperimentsMain {
                 RedSensoresEstado.Evaluation eval = ((RedSensoresEstado)searchAlgorithm.getGoalState()).evaluateSolution();
 
                 System.out.println(String.format(
-                    "100, 4, 4321, 1234, 1, hill-climbing, %f, %d, %f, %d",
+                    "100, 4, 4321, 1234, 1, hill-climbing, %f, %d, %d, %d",
                     alpha, end - start, eval.cost(), eval.throughput()));
             }
         }

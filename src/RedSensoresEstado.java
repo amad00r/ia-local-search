@@ -207,10 +207,10 @@ public class RedSensoresEstado {
         else if (mode == 2) solucionBuena();
     }
 
-    public record Evaluation(double cost, int throughput) {}
+    public record Evaluation(int cost, int throughput) {}
 
     public Evaluation evaluateSolution() {
-        double cost = 0.0;
+        int cost = 0;
         for (SensorInfo sensor : sensoresInfoList)
             cost += computeCost(sensor, sensor.getConectadoA());
         
@@ -223,11 +223,10 @@ public class RedSensoresEstado {
         return new Evaluation(cost, throughput);
     }
 
-    private double computeCost(SensorInfo origen, Conectable destino) {
+    private int computeCost(SensorInfo origen, Conectable destino) {
         int dx = origen.getCoordX() - destino.getCoordX();
         int dy = origen.getCoordY() - destino.getCoordY();
-        double d = Math.sqrt(dx*dx + dy*dy);
-        return d*d * origen.getThroughput();
+        return (dx*dx + dy*dy) * origen.getThroughput();
     }
 
     // TODO: Implementar solucion mala + definir nombre
@@ -238,10 +237,10 @@ public class RedSensoresEstado {
 
         for (int i = 0; i < sensoresInfoList.length; ++i) {
             int candidate = -1;
-            double candidateCost = -1;
+            int candidateCost = -1;
             for (int j = 0; j < sensoresInfoList.length; ++j) {
                 if (!visited[j]) {
-                    double cost = computeCost(sensoresInfoList[j], last);
+                    int cost = computeCost(sensoresInfoList[j], last);
                     if (cost > candidateCost) {
                         candidateCost = cost;
                         candidate = j;
