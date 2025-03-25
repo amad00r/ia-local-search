@@ -205,6 +205,7 @@ public class RedSensoresEstado {
         //Generar solucion inicial
         if (mode == 1) solucionMala();
         else if (mode == 2) solucionBuena();
+        else if (mode == 3) solucionMedia();
     }
 
     public record Evaluation(int cost, int throughput) {}
@@ -255,20 +256,20 @@ public class RedSensoresEstado {
     }
 
     static class Edge {
-        int to, cost, reverse;
+        int from, to, cost;
         int capacity, flow;
 
-        Edge(int to, int capacity, int cost, int flow, int reverse) {
+        Edge(int from, int to, int capacity, int cost, int flow) {
+            this.from = from;
             this.to = to;
             this.capacity = capacity;
             this.cost = cost;
             this.flow = flow;
-            this.reverse = reverse;
         }
     }
 
     public void addEdge(List<List<Edge>> adj, int u, int v, int capacity, int cost) {
-        adj.get(u).add(new Edge(v, capacity, cost, 0, adj.get(v).size()));
+        adj.get(u).add(new Edge(u, v, capacity, cost, 0));
     }
 
     private boolean dijkstra(int nodes, int source, int sink, List<List<Edge>> adj, int[] parent, int[] parentEdge, int[] connections, int[] connectedTo, int[] newFlow, boolean[] visited, boolean[] captured) {
@@ -323,20 +324,14 @@ public class RedSensoresEstado {
                 }
             }
             else {
-                //System.out.println("Not Visited -> " + u);
-                //if (u == source) System.out.println("TEST SOURCE");
-                //else System.out.println("TEST " + u);
-                //if (u == 40) System.out.println("NV40 -> " + u);
                 for (int i = 0; i < adj.get(u).size(); i++) {
                     Edge e = adj.get(u).get(i);
-                    //System.out.println(e.to);
                     if (((e.to < getNumSensores() && connections[e.to] < 3) || (e.to >= getNumSensores() && e.to < (getNumSensores() + getNumCentros()) && connections[e.to] < 25) || e.to >= (getNumSensores() + getNumCentros())) &&
                             (((captured[u] || u >= getNumSensores()) && e.capacity - e.flow >= newFlow[u]) ||
                                     ((!captured[u] && u < getNumSensores()) && e.capacity - (sensoresInfoList[u].getCapacidad() + e.flow) >= newFlow[u])) &&
 
                             dist[u] + e.cost < dist[e.to]) {
 
-                        //System.out.println("IF " + u + " -> " + e.to + " next[2] = " + next[2] + " connections[e.to] = " + connections[e.to] + " captured[e.to] = " + captured[e.to] + " e.capacity[0] = " + e.capacity[0] + " e.flow[0] = " + e.flow[0] + " newFlow[u] = " + newFlow[u] + " dist[u] = " + dist[u] + " e.cost = " + e.cost + " dist[e.to] = " + dist[e.to]);
                         if (!captured[u] && u < getNumSensores()) {
                             newFlow[e.to] = Math.min(newFlow[u], e.capacity - (sensoresInfoList[u].getCapacidad() + e.flow)) + sensoresInfoList[u].getCapacidad();
                         }
@@ -347,7 +342,6 @@ public class RedSensoresEstado {
                         parent[e.to] = u;
                         parentEdge[e.to] = i;
                         pq.add(new int[]{e.to, dist[e.to]});
-                        //System.out.println("TEST");
                     }
                 }
             }
@@ -411,7 +405,6 @@ public class RedSensoresEstado {
 
         int path = 1;
         while (dijkstra(nodes, source, sink, adj, parent, parentEdge, connections, connectedTo, newFlow, visited, captured)) {
-            //System.out.println("PATH " + path);
             ++path;
             for (int u = sink; u != source; u = parent[u]) {
                 int v = parent[u];
@@ -428,10 +421,7 @@ public class RedSensoresEstado {
                     if (parent[v] != source && !visited[parent[v]]) ++connections[v];
                 }
 
-                //System.out.println("newFlow " + v + " -> " + u + " = " + newFlow[u]);
-                //System.out.println("Total Flow Before " + v + " -> " + u + " = " + adj.get(v).get(edgeIdx).flow);
                 adj.get(v).get(edgeIdx).flow += newFlow[u];
-                //System.out.println("Total Flow After " + v + " -> " + u + " = " + adj.get(v).get(edgeIdx).flow);
 
                 if (u != sink) visited[u] = true;
 
@@ -440,9 +430,64 @@ public class RedSensoresEstado {
 
             totalFlow += newFlow[sink];
         }
+    }
 
-        // System.out.println("Flow Total = " + totalFlow);
-        // System.out.println("Costo Total = " + totalCost);
+    private boolean accesible(SensorInfo buscado, SensorInfo sensor) {
+        Conectable next = sensor.getConectadoA();
+        if (next == null || next instanceof CentroInfo) return false;
+        if (next == buscado) return true;
+        return accesible(buscado, (SensorInfo)next);
+    }
+
+    public void solucionMedia() {
+
+        int sensores = getNumSensores();
+
+        List<Edge> edges = new ArrayList<>();
+
+        // Creación aristas sensores
+        for (int i = 0; i < getNumSensores(); ++i) {
+            for (int j = i + 1; j < getNumSensores(); ++j) {
+
+                int dx = sensoresInfoList[i].getCoordX() - sensoresInfoList[j].getCoordX();
+                int dy = sensoresInfoList[i].getCoordY() - sensoresInfoList[j].getCoordY();
+
+                int cost = dx*dx + dy*dy;
+                edges.add(new Edge(i, j, sensoresInfoList[i].getCapacidad()*3, cost, 0));
+                edges.add(new Edge(j, i, sensoresInfoList[j].getCapacidad()*3, cost, 0));
+            }
+
+            // Sensor i a los centros
+            for (int j = 0; j < getNumCentros(); ++j) {
+                int centro = getNumSensores() + j;
+
+                int dx = sensoresInfoList[i].getCoordX() - centrosInfoList[j].getCoordX();
+                int dy = sensoresInfoList[i].getCoordY() - centrosInfoList[j].getCoordY();
+
+                int cost = dx*dx + dy*dy;
+                edges.add(new Edge(i, centro, sensoresInfoList[i].getCapacidad()*3, cost, 0));
+            }
+        }
+
+        edges.sort(Comparator.comparingInt(e -> e.cost));
+
+        int sensoresRestantes = sensores;
+        for (Edge e : edges) {
+            SensorInfo sensor = sensoresInfoList[e.from];
+            if (sensor.getConectadoA() == null) {
+                Conectable dest;
+                if (e.to >= sensores) dest = centrosInfoList[e.to - sensores];
+                else dest = sensoresInfoList[e.to];
+
+                if (dest.conexionesRestantes > 0 && sensor.getThroughput() <= dest.getCapacidadRestante() && (dest instanceof CentroInfo || !accesible(sensor, (SensorInfo) dest))) {
+                    sensor.setConectadoA(dest);
+                    --sensoresRestantes;
+
+                    if (sensoresRestantes == 0) return;
+                }
+            }
+        }
+
     }
 
     //OPERADORES
