@@ -309,7 +309,7 @@ public class ExperimentsMain {
             heuristicFn.setAlpha(alpha);
 
             for (int i = 0; i < sensoresSeeds.length; ++i) {
-                Problem problem = new Problem(new RedSensoresEstado(100, 2, sensoresSeeds[i], centrosSeeds[i], 1), successorFn, goalTest, heuristicFn);
+                Problem problem = new Problem(new RedSensoresEstado(100, 2, sensoresSeeds[i], centrosSeeds[i], 2), successorFn, goalTest, heuristicFn);
 
                 long start = System.currentTimeMillis();
                 SearchAgent agent = new SearchAgent(problem, searchAlgorithm);
@@ -318,7 +318,7 @@ public class ExperimentsMain {
                 RedSensoresEstado.Evaluation eval = ((RedSensoresEstado)searchAlgorithm.getGoalState()).evaluateSolution();
 
                 System.out.println(String.format(Locale.US,
-                    "100; 2; %d; %d; 1; hill-climbing; %f; %d; %d; %d; cambiarConexion + intercambiarConexion",
+                    "100; 2; %d; %d; 2; hill-climbing; %f; %d; %d; %d; cambiarConexion + intercambiarConexion",
                     sensoresSeeds[i], centrosSeeds[i], alpha, end - start, eval.cost(), eval.throughput()));
             }
         }
