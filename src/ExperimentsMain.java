@@ -20,6 +20,7 @@ public class ExperimentsMain {
                 make run-experiment ARGS="2"
                 make run-experiment ARGS="3"
                 make run-experiment ARGS="4"
+                make run-experiment ARGS="5"
                 make run-experiment ARGS="6"
                 make run-experiment ARGS="7 <alpha-low> <alpha-up> <alpha-step>"
                 make run-experiment ARGS="8"
@@ -48,6 +49,10 @@ public class ExperimentsMain {
         case 4:
             if (args.length != 1) usage();
             try { experimento4(); } catch (Exception e) { e.printStackTrace(); }
+            break;
+        case 5:
+            if (args.length != 1) usage();
+            try { experimento5(); } catch (Exception e) { e.printStackTrace(); }
             break;
         case 6:
             if (args.length != 1) usage();
@@ -157,7 +162,9 @@ public class ExperimentsMain {
     }
 
     private static void experimento3() throws Exception {
-        System.out.println("n_sensores, n_centros, sensores_seed, centros_seed, mala1_buena2, algorithm, alpha, steps, stiter, k, λ, time_ms, solution_cost, solution_throughput, operators");
+
+        // Cabecera del CSV
+        System.out.println("n_sensores; n_centros; sensores_seed; centros_seed; mala1_buena2; algorithm; alpha; steps; stiter; k; lambda; time_ms; solution_cost; solution_throughput; operators");
 
         RedSensoresSuccessorFunction successorFn = new RedSensoresSuccessorFunction();
         successorFn.enableCambiarConexion();
@@ -168,14 +175,15 @@ public class ExperimentsMain {
 
         int[] sensoresSeeds = (new Random()).ints().limit(5).toArray();
         int[] centrosSeeds = (new Random()).ints().limit(sensoresSeeds.length).toArray();
-        float[] lambda = new float[]{0.00001f, 0.0001f, 0.001f, 0.01f, 0.1f, 0.5f, 0.9f, 0.95f, 0.99f, 0.999f};
+        float[] lambda = new float[]{0.001f, 0.005f, 0.01f, 0.02f, 0.4f, 0.6f, 0.8f, 0.1f};
+        int[] ks = new int[]{1, 10, 50, 100};
 
         for (int i = 0; i < sensoresSeeds.length; ++i) {
-            for (int k = 1; k <= 3; ++k) {
+            for (int k = 0; k < ks.length; ++k) {
                 for (int j = 0; j < lambda.length; ++j) {
-                    Search simulatedAnnealing = new SimulatedAnnealingSearch(400, 10, k, lambda[j]);
+                    Search simulatedAnnealing = new SimulatedAnnealingSearch(500, 1, ks[k], lambda[j]);
 
-                    Problem problem = new Problem(new RedSensoresEstado(100, 4, sensoresSeeds[i], centrosSeeds[i], 3), successorFn, goalTest, heuristicFn);
+                    Problem problem = new Problem(new RedSensoresEstado(100, 4, sensoresSeeds[i], centrosSeeds[i], 2), successorFn, goalTest, heuristicFn);
 
                     long start = System.currentTimeMillis();
                     SearchAgent agent = new SearchAgent(problem, simulatedAnnealing);
@@ -185,13 +193,14 @@ public class ExperimentsMain {
 
                     System.out.println(String.format(Locale.US,
                             "100; 4; %d; %d; %d; simulated-annealing; %f; %d; %d; %d; %f; %d; %d; %d; cambiarConexion + intercambiarConexion",
-                            sensoresSeeds[i], centrosSeeds[i], 2, alphaTest, 200, 2, k, lambda[j], end - start, eval.cost(), eval.throughput()));
+                            sensoresSeeds[i], centrosSeeds[i], 2, alphaTest, 500, 10, ks[k], lambda[j], end - start, eval.cost(), eval.throughput()));
                 }
             }
         }
     }
 
     private static void experimento4() throws Exception {
+
         // Cabecera del CSV
         System.out.println("n_sensores; n_centros; sensores_seed; centros_seed; mala1_buena2; algorithm; alpha; time_ms; solution_cost; solution_throughput; operators");
 
@@ -204,7 +213,7 @@ public class ExperimentsMain {
 
         Search searchAlgorithm = new HillClimbingSearch();
 
-        for (int i = 4; i <= 16; ++i) {
+        for (int i = 4; i <= 12; i += 2) {
             int[] sensoresSeeds = (new Random()).ints().limit(10).toArray();
             int[] centrosSeeds = (new Random()).ints().limit(sensoresSeeds.length).toArray();
 
@@ -221,6 +230,66 @@ public class ExperimentsMain {
                         "%d; %d; %d; %d; %d; hill-climbing; %f; %d; %d; %d; cambiarConexion + intercambiarConexion",
                         25*i, i, sensoresSeeds[j], centrosSeeds[j], 2, alphaTest, end - start, eval.cost(), eval.throughput()));
             }
+        }
+    }
+
+    private static void experimento5() throws Exception {
+
+        // Cabecera del CSV
+        System.out.println("n_sensores; n_centros; sensores_seed; centros_seed; mala1_buena2; algorithm; alpha; time_ms; solution_cost; solution_throughput; centros_usados");
+
+        RedSensoresSuccessorFunction successorFn = new RedSensoresSuccessorFunction();
+        successorFn.enableCambiarConexion();
+        successorFn.enableIntercambiarConexion();
+        RedSensoresHeuristicFunction heuristicFn = new RedSensoresHeuristicFunction();
+        RedSensoresGoalTest goalTest = new RedSensoresGoalTest();
+        heuristicFn.setAlpha(alphaTest);
+
+        int[] sensoresSeeds = (new Random()).ints().limit(10).toArray();
+        int[] centrosSeeds = (new Random()).ints().limit(sensoresSeeds.length).toArray();
+
+        Search hillClimbing = new HillClimbingSearch();
+
+        for (int i = 0; i < sensoresSeeds.length; ++i) {
+            RedSensoresEstado red = new RedSensoresEstado(100, 4, sensoresSeeds[i], centrosSeeds[i], 2);
+            Problem problem = new Problem(red, successorFn, goalTest, heuristicFn);
+
+            long start = System.currentTimeMillis();
+            SearchAgent agent = new SearchAgent(problem, hillClimbing);
+            long end = System.currentTimeMillis();
+
+            RedSensoresEstado.Evaluation eval = ((RedSensoresEstado)hillClimbing.getGoalState()).evaluateSolution();
+
+            int centros = 0;
+            for (int j = 0; j < red.getNumCentros(); ++j) {
+                if (red.getCentroAt(j).getConexionesRestantes() < 25) ++centros;
+            }
+
+            System.out.println(String.format(Locale.US,
+                    "%d; %d; %d; %d; %d; hill-climbing; %f; %d; %d; %d; %d",
+                    100, 4, sensoresSeeds[i], centrosSeeds[i], 2, alphaTest, end - start, eval.cost(), eval.throughput(), centros));
+        }
+
+        Search simulatedAnnealing = new SimulatedAnnealingSearch(500, 1, 1, 0.8);
+
+        for (int i = 0; i < sensoresSeeds.length; ++i) {
+            RedSensoresEstado red = new RedSensoresEstado(100, 4, sensoresSeeds[i], centrosSeeds[i], 2);
+            Problem problem = new Problem(red, successorFn, goalTest, heuristicFn);
+
+            long start = System.currentTimeMillis();
+            SearchAgent agent = new SearchAgent(problem, simulatedAnnealing);
+            long end = System.currentTimeMillis();
+
+            RedSensoresEstado.Evaluation eval = ((RedSensoresEstado)simulatedAnnealing.getGoalState()).evaluateSolution();
+
+            int centros = 0;
+            for (int j = 0; j < red.getNumCentros(); ++j) {
+                if (red.getCentroAt(j).getConexionesRestantes() < 25) ++centros;
+            }
+
+            System.out.println(String.format(Locale.US,
+                    "%d; %d; %d; %d; %d; simulated-annealing; %f; %d; %d; %d; %d",
+                    100, 4, sensoresSeeds[i], centrosSeeds[i], 2, alphaTest, end - start, eval.cost(), eval.throughput(), centros));
         }
     }
 
