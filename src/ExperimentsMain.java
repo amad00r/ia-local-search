@@ -314,7 +314,7 @@ public class ExperimentsMain {
 
         for (int i = 2; i <= 10; i += 2) {
             for (int k = 0; k < 10; ++k) {
-                RedSensoresEstado estado = new RedSensoresEstado(100, i, sensoresSeeds[i - 1], centrosSeeds[i - 1], 2);
+                RedSensoresEstado estado = new RedSensoresEstado(100, i, sensoresSeeds[k], centrosSeeds[k], 2);
                 Problem problem = new Problem(estado, successorFn, goalTest, heuristicFn);
 
                 long start = System.currentTimeMillis();
@@ -330,15 +330,15 @@ public class ExperimentsMain {
 
                 System.out.println(String.format(Locale.US,
                         "100; %d; %d; %d; 2; hill-climbing; %f; %d; %d; %d; %d",
-                        i, sensoresSeeds[i - 1], centrosSeeds[i - 1], alphaTest, end - start, eval.cost(), eval.throughput(), centrosUsados));
+                        i, sensoresSeeds[k], centrosSeeds[k], alphaTest, end - start, eval.cost(), eval.throughput(), centrosUsados));
             }
         }
 
-        searchAlgorithm = new SimulatedAnnealingSearch(1, 1, 1, 0.001);
+        searchAlgorithm = new SimulatedAnnealingSearch(500, 1, 1, 0.8);
 
         for (int i = 2; i <= 10; i += 2) {
             for (int k = 0; k < 10; ++k) {
-                RedSensoresEstado estado = new RedSensoresEstado(100, i, sensoresSeeds[i - 1], centrosSeeds[i - 1], 2);
+                RedSensoresEstado estado = new RedSensoresEstado(100, i, sensoresSeeds[k], centrosSeeds[k], 2);
                 Problem problem = new Problem(estado, successorFn, goalTest, heuristicFn);
 
                 long start = System.currentTimeMillis();
@@ -354,7 +354,7 @@ public class ExperimentsMain {
 
                 System.out.println(String.format(Locale.US,
                         "100; %d; %d; %d; 2; simulatedannealing; %f; %d; %d; %d; %d",
-                        i, sensoresSeeds[i - 1], centrosSeeds[i - 1], alphaTest, end - start, eval.cost(), eval.throughput(), centrosUsados));
+                        i, sensoresSeeds[k], centrosSeeds[k], alphaTest, end - start, eval.cost(), eval.throughput(), centrosUsados));
             }
         }
     }
