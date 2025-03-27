@@ -11,7 +11,7 @@ import java.util.Random;
 
 public class ExperimentsMain {
 
-    private static double alphaTest = 0.00025;
+    private static double alphaTest = 0.4;
 
     private static void usage() {
         System.err.println("""

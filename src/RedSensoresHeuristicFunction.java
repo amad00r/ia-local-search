@@ -55,6 +55,6 @@ public class RedSensoresHeuristicFunction implements HeuristicFunction {
     // }
     public double getHeuristicValue(Object state) throws IllegalStateException {
         RedSensoresEstado.Evaluation eval = ((RedSensoresEstado)state).evaluateSolution();
-        return alpha * eval.cost() - (1 - alpha) * eval.throughput();
+        return alpha * eval.cost() - (1 - alpha) * eval.throughput() * 1000;
     }
 }
