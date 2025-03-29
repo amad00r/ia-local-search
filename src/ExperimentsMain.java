@@ -24,6 +24,7 @@ public class ExperimentsMain {
                 make run-experiment ARGS="6"
                 make run-experiment ARGS="7 <alpha-low> <alpha-up> <alpha-step>"
                 make run-experiment ARGS="8"
+                make run-experiment ARGS="9"
             """
         );
         System.exit(1);
@@ -68,6 +69,10 @@ public class ExperimentsMain {
         case 8:
             if (args.length != 1) usage();
             try { experimento8(); } catch (Exception e) { e.printStackTrace(); }
+            break;
+        case 9:
+            if (args.length != 1) usage();
+            try { experimentoHeuristicas(); } catch (Exception e) { e.printStackTrace(); }
             break;
         default:
             throw new UnsupportedOperationException(String.format("el experimento `%d` no está implementado", numExperimento));
@@ -334,7 +339,7 @@ public class ExperimentsMain {
             }
         }
 
-        searchAlgorithm = new SimulatedAnnealingSearch(500, 1, 1, 0.8);
+        searchAlgorithm = new SimulatedAnnealingSearch(500, 1, 1, 0.05);
 
         for (int i = 2; i <= 10; i += 2) {
             for (int k = 0; k < 10; ++k) {
@@ -417,5 +422,69 @@ public class ExperimentsMain {
         System.out.println(String.format(Locale.US,
             "100; 4; 4321; 1234; 2; hill-climbing; %f; %d; %d; %d",
             alphaTest, end - start, eval.cost(), eval.throughput()));
+    }
+
+    private static void experimentoHeuristicas() throws Exception {
+        RedSensoresSuccessorFunction successorFn = new RedSensoresSuccessorFunction();
+        successorFn.enableCambiarConexion();
+        successorFn.enableIntercambiarConexion();
+
+        RedSensoresGoalTest goalTest = new RedSensoresGoalTest();
+
+        RedSensoresHeuristicFunction heuristicFn = new RedSensoresHeuristicFunction();
+        heuristicFn.setAlpha(alphaTest);
+
+        int[] sensoresSeeds = (new Random()).ints().limit(10).toArray();
+        int[] centrosSeeds = (new Random()).ints().limit(sensoresSeeds.length).toArray();
+
+        Search searchAlgorithm = new HillClimbingSearch();
+
+        // Cabecera del CSV
+        System.out.println("n_sensores; n_centros; sensores_seed; centros_seed; mala1_buena2; algorithm; alpha; time_ms; solution_cost; solution_throughput; heuristica utilizada"); 
+
+        //Mala
+        for (int i = 1; i <= 5; i++) {
+            heuristicFn.setChoice(i);
+            for (int k = 0; k <= 10; ++k) {
+                alphaTest = 0.1 * k;
+                for (int z = 0; z < 10; ++z) {
+                    heuristicFn.setAlpha(alphaTest);
+                    RedSensoresEstado estado = new RedSensoresEstado(100, 4, sensoresSeeds[z], centrosSeeds[z], 1);
+                    Problem problem = new Problem(estado, successorFn, goalTest, heuristicFn);
+
+                    long start = System.currentTimeMillis();
+                    SearchAgent agent = new SearchAgent(problem, searchAlgorithm);
+                    long end = System.currentTimeMillis();
+
+                    RedSensoresEstado.Evaluation eval = ((RedSensoresEstado)searchAlgorithm.getGoalState()).evaluateSolution();
+
+                    System.out.println(String.format(Locale.US,
+                            "100; 4; %d; %d; 1; hill-climbing; %f; %d; %d; %d; %d",
+                            sensoresSeeds[z], centrosSeeds[z], alphaTest, end - start, eval.cost(), eval.throughput(), i));
+                }
+            }
+        }
+
+        for (int i = 1; i <= 5; i++) {
+            heuristicFn.setChoice(i);
+            for (int k = 0; k <= 10; ++k) {
+                alphaTest = 0.1 * k;
+                for (int z = 0; z < 10; ++z) {
+                    heuristicFn.setAlpha(alphaTest);
+                    RedSensoresEstado estado = new RedSensoresEstado(100, 4, sensoresSeeds[z], centrosSeeds[z], 2);
+                    Problem problem = new Problem(estado, successorFn, goalTest, heuristicFn);
+
+                    long start = System.currentTimeMillis();
+                    SearchAgent agent = new SearchAgent(problem, searchAlgorithm);
+                    long end = System.currentTimeMillis();
+
+                    RedSensoresEstado.Evaluation eval = ((RedSensoresEstado)searchAlgorithm.getGoalState()).evaluateSolution();
+
+                    System.out.println(String.format(Locale.US,
+                            "100; 4; %d; %d; 1; hill-climbing; %f; %d; %d; %d; %d",
+                            sensoresSeeds[z], centrosSeeds[z], alphaTest, end - start, eval.cost(), eval.throughput(), i));
+                }
+            }
+        }
     }
 }
