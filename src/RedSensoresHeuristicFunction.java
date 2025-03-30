@@ -45,12 +45,7 @@ public class RedSensoresHeuristicFunction implements HeuristicFunction {
             case 5:
                 return alpha * eval.cost() - (1 - alpha) * eval.throughput() * 1000;
             default:
-                throw new IllegalStateException("Usad un numero entre 1 y 4");
+                throw new IllegalStateException("Usad un numero entre 1 y 5");
         }   
     }
-
-    // public double getHeuristicValue(Object state) throws IllegalStateException {
-    //     RedSensoresEstado.Evaluation eval = ((RedSensoresEstado)state).evaluateSolution();
-    //     return alpha * eval.cost() - (1 - alpha) * eval.throughput() * 1000;
-    // }
 }

@@ -8,6 +8,7 @@ import aima.search.framework.SearchAgent;
 
 import java.util.Locale;
 import java.util.Random;
+import java.util.Arrays;
 
 public class ExperimentsMain {
 
@@ -25,6 +26,7 @@ public class ExperimentsMain {
                 make run-experiment ARGS="7 <alpha-low> <alpha-up> <alpha-step>"
                 make run-experiment ARGS="8"
                 make run-experiment ARGS="9"
+                make run-experiment ARGS="10"
             """
         );
         System.exit(1);
@@ -73,6 +75,10 @@ public class ExperimentsMain {
         case 9:
             if (args.length != 1) usage();
             try { experimentoHeuristicas(); } catch (Exception e) { e.printStackTrace(); }
+            break;
+        case 10:
+            if (args.length != 1) usage();
+            try { experimentoEspacioSoluciones(); } catch (Exception e) { e.printStackTrace(); }
             break;
         default:
             throw new UnsupportedOperationException(String.format("el experimento `%d` no está implementado", numExperimento));
@@ -484,6 +490,60 @@ public class ExperimentsMain {
                             "100; 4; %d; %d; 1; hill-climbing; %f; %d; %d; %d; %d",
                             sensoresSeeds[z], centrosSeeds[z], alphaTest, end - start, eval.cost(), eval.throughput(), i));
                 }
+            }
+        }
+    }
+
+    private static boolean accesible(int[] grafo, int from, int to) {
+        if (from == to) return true;
+
+        while (from < grafo.length) {
+            if (from == -1) return false;
+            from = grafo[from];
+            if (from == to) return true;
+        }
+
+        return false;
+    }
+
+    private static int experimentoEspacioSolucionesRec(int[] grafo, int[] conexionesRestantes, int idx) {
+        if (idx >= grafo.length || grafo[idx] != -1) {
+            for (int i = 0; i < grafo.length; ++i)
+                if (grafo[i] == -1)
+                    return experimentoEspacioSolucionesRec(grafo, conexionesRestantes, i);
+
+            System.err.println(Arrays.toString(grafo));
+            return 1;
+        }
+
+        int count = 0;
+
+        for (int i = 0; i < conexionesRestantes.length; ++i) {
+            if (conexionesRestantes[i] > 0 && !accesible(grafo, i, idx)) {
+                --conexionesRestantes[i];
+                grafo[idx] = i;
+                count += experimentoEspacioSolucionesRec(grafo, conexionesRestantes, i);
+                ++conexionesRestantes[i];
+            }
+        }
+
+        grafo[idx] = -1;
+        return count;
+    }
+
+    private static void experimentoEspacioSoluciones() {
+        System.out.println("n_sensores; n_centros; size_espacio_soluciones"); 
+
+        for (int nSensores = 1; nSensores <= 100; ++nSensores) {
+            for (int nCentros = 3; nCentros <= 3; ++nCentros) {
+                int[] grafo = new int[nSensores];
+                Arrays.fill(grafo, -1);
+                int[] conexionesRestantes = new int[nSensores + nCentros];
+                Arrays.fill(conexionesRestantes, 0, nSensores, 3);
+                Arrays.fill(conexionesRestantes, nSensores, nSensores + nCentros, 25);
+
+                System.out.println(String.format("%d; %d; %d",
+                    nSensores, nCentros, experimentoEspacioSolucionesRec(grafo, conexionesRestantes, 0)));
             }
         }
     }
