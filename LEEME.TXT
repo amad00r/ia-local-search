@@ -1,0 +1,54 @@
+Instrucciones para ejecutar la práctica
+=======================================
+
+Linux:
+
+	- Para compilar los ejecutables:
+		> make
+
+	- Para ejecutar con valores libres:
+		> make run
+
+	- Para ejecutar experimentos específicos:
+		> make run-experiment
+
+		Usage:
+			make run-experiment ARGS="1"
+			make run-experiment ARGS="2"
+			make run-experiment ARGS="3"
+			make run-experiment ARGS="4"
+			make run-experiment ARGS="5"
+			make run-experiment ARGS="6"
+			make run-experiment ARGS="7 <alpha-low> <alpha-up> <alpha-step>"
+			make run-experiment ARGS="8"
+			make run-experiment ARGS="9"
+			make run-experiment ARGS="10"
+
+	- Para eliminar archivos generados:
+		> make clean
+
+Windows:
+
+	Primero de todo ejecutar el siguiente comando para compilar:
+		> ./compile.bat
+
+	- Para ejecutar con valores libres:
+		> ./run.bat
+
+	- Para ejecutar experimentos específicos:
+		> ./runExperiment.bat
+
+		Usage:
+			./runExperiment 1
+			./runExperiment 2
+			./runExperiment 3
+			./runExperiment 4
+			./runExperiment 5
+			./runExperiment 6
+			./runExperiment 7 <alpha-low> <alpha-up> <alpha-step>
+			./runExperiment 8
+			./runExperiment 9
+			./runExperiment 10
+
+	- Para eliminar archivos generados:
+		> ./clean.bat

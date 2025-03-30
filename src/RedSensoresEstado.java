@@ -205,7 +205,6 @@ public class RedSensoresEstado {
         //Generar solucion inicial
         if (mode == 1) solucionMala();
         else if (mode == 2) solucionBuena();
-        else if (mode == 3) solucionMedia();
     }
 
     public record Evaluation(int cost, int throughput) {}
@@ -437,57 +436,6 @@ public class RedSensoresEstado {
         if (next == null || next instanceof CentroInfo) return false;
         if (next == buscado) return true;
         return accesible(buscado, (SensorInfo)next);
-    }
-
-    public void solucionMedia() {
-
-        int sensores = getNumSensores();
-
-        List<Edge> edges = new ArrayList<>();
-
-        // Creación aristas sensores
-        for (int i = 0; i < getNumSensores(); ++i) {
-            for (int j = i + 1; j < getNumSensores(); ++j) {
-
-                int dx = sensoresInfoList[i].getCoordX() - sensoresInfoList[j].getCoordX();
-                int dy = sensoresInfoList[i].getCoordY() - sensoresInfoList[j].getCoordY();
-
-                int cost = dx*dx + dy*dy;
-                edges.add(new Edge(i, j, sensoresInfoList[i].getCapacidad()*3, cost, 0));
-                edges.add(new Edge(j, i, sensoresInfoList[j].getCapacidad()*3, cost, 0));
-            }
-
-            // Sensor i a los centros
-            for (int j = 0; j < getNumCentros(); ++j) {
-                int centro = getNumSensores() + j;
-
-                int dx = sensoresInfoList[i].getCoordX() - centrosInfoList[j].getCoordX();
-                int dy = sensoresInfoList[i].getCoordY() - centrosInfoList[j].getCoordY();
-
-                int cost = dx*dx + dy*dy;
-                edges.add(new Edge(i, centro, sensoresInfoList[i].getCapacidad()*3, cost, 0));
-            }
-        }
-
-        edges.sort(Comparator.comparingInt(e -> e.cost));
-
-        int sensoresRestantes = sensores;
-        for (Edge e : edges) {
-            SensorInfo sensor = sensoresInfoList[e.from];
-            if (sensor.getConectadoA() == null) {
-                Conectable dest;
-                if (e.to >= sensores) dest = centrosInfoList[e.to - sensores];
-                else dest = sensoresInfoList[e.to];
-
-                if (dest.conexionesRestantes > 0 && sensor.getThroughput() <= dest.getCapacidadRestante() && (dest instanceof CentroInfo || !accesible(sensor, (SensorInfo) dest))) {
-                    sensor.setConectadoA(dest);
-                    --sensoresRestantes;
-
-                    if (sensoresRestantes == 0) return;
-                }
-            }
-        }
-
     }
 
     //OPERADORES

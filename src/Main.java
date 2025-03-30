@@ -33,7 +33,6 @@ public class Main {
         System.out.println("Ingrese el modo de generación: ");
         System.out.println("    1. Solucion mala");
         System.out.println("    2. Solucion buena");
-        System.out.println("    3. Solucion media");
         int mode = scanner.nextInt();
 
         System.out.println("Ingrese el tipo de algortimo: ");
@@ -57,9 +56,9 @@ public class Main {
         RedSensoresSuccessorFunction successorFn = new RedSensoresSuccessorFunction();
         successorFn.enableAll();
         //successorFn.enableCambiarConexion();
-        Search simulatedAnnealing = new SimulatedAnnealingSearch(200, 1, 2, 0.5);
+        Search simulatedAnnealing = new SimulatedAnnealingSearch(500, 1, 1, 0.05);
         RedSensoresHeuristicFunction heuristicFunction = new RedSensoresHeuristicFunction();
-        heuristicFunction.setAlpha(0.00025);
+        heuristicFunction.setAlpha(0.4);
         Problem p = new Problem (redSensores, successorFn, new RedSensoresGoalTest(), heuristicFunction);
 
         SearchAgent agent = null;
