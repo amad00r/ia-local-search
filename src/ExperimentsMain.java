@@ -180,7 +180,7 @@ public class ExperimentsMain {
 
         int[] sensoresSeeds = (new Random()).ints().limit(5).toArray();
         int[] centrosSeeds = (new Random()).ints().limit(sensoresSeeds.length).toArray();
-        float[] lambda = new float[]{0.001f, 0.005f, 0.01f, 0.02f, 0.4f, 0.6f, 0.8f, 0.1f};
+        float[] lambda = new float[]{0.001f, 0.005f, 0.01f, 0.05f, 0.1f, 0.5f, 0.9f};
         int[] ks = new int[]{1, 10, 50, 100};
 
         for (int i = 0; i < sensoresSeeds.length; ++i) {
@@ -218,7 +218,7 @@ public class ExperimentsMain {
 
         Search searchAlgorithm = new HillClimbingSearch();
 
-        for (int i = 4; i <= 12; i += 2) {
+        for (int i = 4; i <= 14; i += 2) {
             int[] sensoresSeeds = (new Random()).ints().limit(10).toArray();
             int[] centrosSeeds = (new Random()).ints().limit(sensoresSeeds.length).toArray();
 
